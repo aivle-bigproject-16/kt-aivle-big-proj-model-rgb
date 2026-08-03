@@ -1,0 +1,33 @@
+# 데이터 (라이선스상 레포에 올리지 않음)
+data/
+datasets/
+*.zip
+*.tar
+*.7z
+
+# 가중치 · 학습 출력 (S3 models/ 로 올라감)
+*.pt
+*.onnx
+*.engine
+*.pth
+runs/
+runs_main/
+kt_out/
+kt_out_1/
+champions/
+work/
+
+# 추론 산출물
+infer_json/
+detections_all.json
+viz/
+
+# 비밀
+.env
+*.key
+
+# 파이썬 · 노트북
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
