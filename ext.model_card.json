@@ -1,0 +1,256 @@
+{
+  "schema_version": "1.0",
+  "task": "detect-ext",
+  "modality": "RGB",
+  "updated_at": "2026-08-04",
+  "structure": "OWLv2(검출) → Qwen2.5-VL(해설) 2단. 학습 0회 · 라벨 0장 · 외부 API 0건",
+
+  "identity": {
+    "weight_file": null,
+    "_weight_file_note": "학습된 가중치가 없다. 사전학습 모델 2개를 그대로 쓴다.",
+    "detector_model_id": "google/owlv2-large-patch14-ensemble",
+    "detector_revision": null,
+    "vlm_model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+    "vlm_revision": null,
+    "weight_sha256": null,
+    "_sha256_substitute": "가중치 파일이 없으니 해시 대상도 없다. 대응물은 HF revision 고정이다 — from_pretrained(MODEL_ID) 만 쓰면 리포지토리가 갱신됐을 때 다른 가중치를 받아도 조용히 돈다. 배포 시 두 모델 다 revision='<커밋 해시>' 로 박을 것. 현재 노트북은 고정하지 않는다.",
+    "train_run": null,
+    "labels_used": 0,
+    "training_runs": 0,
+    "source_repo": "aivle-bigproject-16/kt-aivle-big-proj-model-rgb",
+    "source_commit": null,
+    "trained_at": null
+  },
+
+  "runtime": {
+    "python": null,
+    "torch": null,
+    "transformers": null,
+    "accelerate": null,
+    "qwen-vl-utils": null,
+    "pillow": null,
+    "numpy": null,
+    "lockfile": null,
+    "_status": "❌ 고정 안 됨. 노트북이 `pip install -U transformers accelerate` / `-U \"transformers>=4.49\" accelerate qwen-vl-utils` 로 매번 최신판을 깐다.",
+    "_risk": "transformers 는 이미 한 번 코드를 죽였다 — 신버전에 post_process_object_detection 이 없어 폴백을 마련한 코드가 폴백 전에 AttributeError 로 터졌다(0804 §11 #1). 지금은 지연 평가로 고른다. 더 위험한 건 조용한 쪽 — 후처리 구현이 바뀌어 점수 스케일이 달라지면 thr 0.08·0.12 운영점이 에러 없이 무효가 된다.",
+    "gpu_requirement": "노트북은 A100 40GB 기준. Qwen2.5-VL-7B bf16 ~16GB + OWLv2-large 별도. 배포 GPU 가 T4/L4 면 수용 가능 여부 확인 필요"
+  },
+
+  "input": {
+    "source_spec": { "width": 1920, "height": 1080, "naming": "RGB_cell_cylindrical", "id_count": 759 },
+    "color_space": "RGB",
+    "frames_per_cell": 270,
+    "imgsz": null,
+    "_imgsz_note": "OWLv2 프로세서가 처리한다. ultralytics 식 imgsz 개념이 없다.",
+    "tiles": 1,
+    "_tiles_note": "1 = 크롭 통짜. 작은 결함을 놓치면 3(세로 3등분)으로. 미사용",
+
+    "cell_crop": {
+      "enabled": true,
+      "_answers_request": "요청서 §3 'RGB 도 ROI 전처리가 있는가' → 있다. '이미지 = ROI = 전체 프레임' 이라던 예전 문서는 v4.2 부터 맞지 않는다.",
+      "source": "battery_ext_crop_retrain.ipynb §1 (학습·추론 공용 함수)",
+      "method": "HSV 채도 기반 (배경=무채색 · 셀=유채색 전제)",
+      "sat_threshold": 40,
+      "density_threshold": 0.10,
+      "pad": 0.10,
+      "_pad_basis": "결함 보존 Damaged 100% / Pollution 99.7%",
+      "area_range": [0.02, 0.90],
+      "fallback": "채도로 안 갈리면 밝기(V). 추정 실패 시 원본 전체(0,0,1,1) — 파이프라인을 멈추지 않는다",
+      "size_fixed": false,
+      "coordinate_warning": "리포트 좌표는 원본 기준이어야 한다. 크롭 좌표를 그대로 내보내면 프론트에서 박스가 어긋난다. to_orig_coords() 로 되돌릴 것(왕복 변환 자체 검증 있음)."
+    },
+
+    "square_padding": {
+      "required": true,
+      "how": "원본을 좌상단에 놓고 max(W,H) 정사각 캔버스(검정)로 패딩. target_sizes 도 패딩 후 정사각 크기로 넘긴다",
+      "why": "OWLv2 전처리가 이미지를 정사각으로 패딩한다. 직사각을 그대로 넣으면 반환 좌표가 패딩된 캔버스 기준이라 박스가 통째로 어긋난다. 에러는 안 나고 숫자만 틀린다."
+    }
+  },
+
+  "inference": {
+    "batch_size": 8,
+    "topk": 12,
+    "_topk_gap": "노트북 기본 12(장당 박스 상한)인데 performance 의 실측은 thr 0.08 에서 결함 프레임 27.4 박스/장이다. 12 로 잘렸다면 나올 수 없는 값이므로 채점은 topk 를 올린 상태에서 돌았다. 게이트가 N≥8 이라 12 로도 동작은 하지만, 실측 재현에는 실제 쓴 topk 값이 필요하다.",
+    "drop_neg": true,
+    "postprocess_api": "post_process_grounded_object_detection 우선, 없으면 post_process_object_detection 폴백 (지연 평가로 선택)",
+
+    "stage1_gate": {
+      "role": "프레임 결함/정상 판정",
+      "threshold": 0.08,
+      "min_boxes": 8,
+      "precision": 0.876,
+      "recall": 1.000,
+      "f1": 0.934,
+      "note": "박스 개수만 세므로 위치 정확도가 필요 없다. 그래서 0.08 의 낮은 순열 배율(1.35×)이 무해하다."
+    },
+    "stage2_locate": {
+      "role": "VLM 에 넘길 박스 선정",
+      "threshold": 0.12,
+      "point_recall": 0.818,
+      "permutation": 0.384,
+      "ratio": 2.13,
+      "note": "박스 위치가 맞아야 VLM 이 제대로 본다. 두 단의 임계를 하나로 통일하면 안 된다."
+    },
+    "stage3_vlm": {
+      "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+      "dtype": "bfloat16",
+      "device_map": "auto",
+      "mode": "per_item",
+      "_mode_note": "montage(SoM 번호 참조)는 실패했다 — 작은 VLM 이 번호↔칸 매핑에 약해 캡이 없는 칸을 '금속캡 각인'이라 하고 근거 문장이 9칸에 글자까지 동일했다. per_item 은 칸당 따로 물어 매핑 문제가 원천적으로 없다. 비용 셀당 ~9회 호출(~20초). montage 는 검증용으로만 남김.",
+      "do_sample": false,
+      "max_new_tokens": 1600,
+      "montage_params": { "min_crop": 128, "per_tag_cap": 2, "per_frame_cap": 1,
+        "_warning": "PIL.thumbnail() 은 확대를 안 한다. 63px 크롭이 320px 칸 구석에 붙어 흰 여백 96% 가 된 적이 있다 → MIN_CROP 128 + resize." }
+    },
+
+    "queries": {
+      "_role": "질의어가 이 파이프라인의 실질 '라벨'이다. 리스트 한 줄을 바꾸면 찾는 대상이 바뀐다.",
+      "defect_query_count": 23,
+      "distractor_query_count": 10,
+      "total": 33,
+      "design_rules": [
+        "영어 · 짧은 명사구 (문장이나 형용사 나열은 신호가 희석)",
+        "추상어(defect·anomaly)는 안 먹는다 — 눈에 보이는 물체/현상으로",
+        "한 유형에 영어 표현 여러 개를 붙여 OR 로",
+        "한국어 키는 평가셋 TYPES 와 같은 이름이어야 유형별 recall 이 붙는다 (assert 로 강제)"
+      ],
+      "query_map": {
+        "녹·부식": ["rust", "rusty metal", "brown rust stain", "corroded metal surface"],
+        "벗겨짐·박리": ["peeling plastic wrap", "peeled off label", "exposed metal under wrapper", "wrapper coming off"],
+        "파손·찢김": ["tear in plastic film", "crack on surface", "puncture hole", "dent"],
+        "긁힘·스크래치": ["scratch", "scratch mark", "scratched metal surface", "scuff mark"],
+        "들뜸": ["air bubble under film", "wrinkled plastic wrap", "lifted film edge"],
+        "오염·이물질": ["dirt stain", "smudge", "white residue", "foreign particle on surface"]
+      },
+      "neg_map": {
+        "정상:인쇄·각인": ["printed text", "printed letters on label", "engraved serial number"],
+        "정상:반사": ["light reflection", "specular highlight"],
+        "정상:금속캡": ["metal cap", "battery terminal"],
+        "정상:테두리": ["bottom edge of cylinder", "rim of metal can", "silhouette edge"]
+      },
+      "drop_tags": ["정상:인쇄·각인", "정상:반사", "정상:테두리"],
+      "_keep_metal_cap": "정상:금속캡 은 이름만 붙이고 버리지 않는다. 구조물 판정으로 지우면 오탐 5개 지우고 진짜 결함 9개를 잃는다(순손실 −4). 캡 위의 부식은 결함이다. DROP_TAGS 에 추가하지 말 것."
+    }
+  },
+
+  "output": {
+    "detector_tuple": "(x1, y1, x2, y2, score, tag, query)",
+    "bbox_format": "xyxy",
+    "coordinate_reference": "crop_image",
+    "_coordinate_note": "타일 오프셋은 복원되어 있으나 셀 크롭 기준이다. 원본 기준 리포트는 to_orig_coords() 필요.",
+    "defect_types": ["녹·부식", "벗겨짐·박리", "파손·찢김", "긁힘·스크래치", "들뜸", "오염·이물질"],
+    "class_map": null,
+    "_class_map_gap": "계약 §6.5 RGB enum 은 CRACK·SPOT 2종인데 이 파이프라인은 6종이다. 파손·찢김→CRACK, 오염·이물질→SPOT 까지는 자연스럽지만 녹·부식(사람 점 82개로 최다)·긁힘·스크래치·벗겨짐·박리·들뜸 이 갈 곳이 없다. 선택지는 ①6종을 2종으로 뭉갠다(정보 손실 — '녹을 못 잡는다'를 다시 못 보게 됨) ②계약 enum 을 늘린다. 계약 쪽 결정 필요.",
+
+    "vlm_fields": {
+      "관찰": "보이는 것 묘사. 판정보다 먼저 나온다 — 자기회귀라 먼저 나온 토큰이 뒤를 구속하므로 판단 전에 본 것을 묘사시켜 사진에 붙들어 맨다. 순서를 바꾸지 말 것",
+      "판정": ["결함", "정상"],
+      "종류_결함": ["녹·부식", "벗겨짐·박리", "파손·찢김", "긁힘·스크래치", "들뜸", "오염·이물질", "기타"],
+      "종류_정상": ["각인·인쇄", "반사·얼룩", "정상 표면"],
+      "위치": ["금속캡", "상단", "몸통", "하단", "불명"],
+      "등급": "1~5 정수",
+      "근거": "한 문장"
+    },
+    "grades": {
+      "5": { "name": "치명", "기준": "금속 노출(외피 관통·찢김), 캡·안전변 변형·파손, 깊게 눌림", "처분": "폐기" },
+      "4": { "name": "중대", "기준": "외피 벗겨짐·박리 진행 중, 넓은 부식(면적 1/4 이상)", "처분": "폐기 후보" },
+      "3": { "name": "보통", "기준": "뚜렷한 국소 부식·변색·들뜸. 열자마자 눈에 띄는 크기", "처분": "재검사" },
+      "2": { "name": "경미", "기준": "자세히 봐야 보이는 얕은 긁힘·옅은 얼룩", "처분": "기록만" },
+      "1": { "name": "무시", "기준": "머리카락처럼 가는 선, 확대해야 겨우 보이는 점", "처분": "통과" },
+      "_why_5": "3단계(상/중/하)는 실측에서 전부 한 값으로 뭉쳐 변별력이 0이었다. 분기점은 크기가 아니라 금속이 드러났는가 / 안전변이 성한가다."
+    },
+    "verdict_rule": null,
+    "_verdict_gap": "셀 단위 PASS/REJECT 가 성립하지 않는다. 표면이 가장 고른 셀 10개도 육안으로 전부 결함이었고, 매니페스트가 '무결함'이라 표시한 비-산업 셀 2개(515·581)도 둘 다 오염이 실재했다. 계약 §12.1 의 셀 단위 판정은 분모가 없다. 등급 기반(폐기/재검사/통과)으로 재설계 제안 — 위 grades 가 이미 그 처분을 담고 있다. 계약 쪽 논의 필요. 단 프레임 단위로는 사람이 검증한 무결함 51장이 있어 게이트 P/R 은 잴 수 있다.",
+    "schema_sample": null,
+    "_schema_gap": "CT 의 ct_output_schema.sample.json 대응물이 없다"
+  },
+
+  "performance": {
+    "eval_set": {
+      "path": "MyDrive/ext_evalset/labels_me.json",
+      "images": 150, "defect": 99, "clean": 51, "points": 302,
+      "sampling": "셀당 최대 2장 층화, seed 42, val split",
+      "labeler": "사람(사용자) 클릭 — 결함 중심에 점 하나"
+    },
+    "metric": "점 recall — 예측 박스 안에 사람 점이 들어가면 적중",
+    "_why_point": "IoU 는 '예측이 GT 와 크기까지 비슷한가'를 묻는다. 결함 전체를 정확히 잡을수록 면적이 커져 IoU 가 떨어진다. 점은 조각이 될 수 없고 크기 논쟁도 없다.",
+    "control": "순열(남의 박스로 채점). 사전 확정 규칙 = 배율 < 2 면 폐기",
+
+    "threshold_sweep": [
+      { "thr": 0.08, "point_recall": 0.954, "permutation": 0.705, "ratio": 1.35, "verdict": "폐기", "boxes_defect": 27.4, "boxes_clean": 5.9, "asymmetry": 4.6 },
+      { "thr": 0.12, "point_recall": 0.818, "permutation": 0.384, "ratio": 2.13, "verdict": "채택", "boxes_defect": 13.0, "boxes_clean": 2.1, "asymmetry": 6.3 },
+      { "thr": 0.18, "point_recall": 0.507, "permutation": 0.132, "ratio": 3.84, "verdict": "통과", "boxes_defect": 5.3, "boxes_clean": 0.53, "asymmetry": 10.1 },
+      { "thr": 0.25, "point_recall": 0.291, "permutation": 0.056, "ratio": 5.20, "verdict": "통과", "boxes_defect": 2.3, "boxes_clean": 0.18, "asymmetry": 13.2 }
+    ],
+    "frame_gate": [
+      { "설정": "thr0.08 N≥8", "P": 0.876, "R": 1.000, "F1": 0.934, "채택": true },
+      { "설정": "thr0.12 N≥5", "P": 0.957, "R": 0.909, "F1": 0.933 },
+      { "설정": "thr0.18 N≥2", "P": 0.976, "R": 0.828, "F1": 0.896 }
+    ],
+    "by_type": {
+      "녹·부식":       { "points": 82, "owlv2": 0.890, "yolo": 0.024 },
+      "긁힘·스크래치": { "points": 30, "owlv2": 0.867, "yolo": 0.000 },
+      "들뜸":         { "points": 15, "owlv2": 0.600, "yolo": 0.000 },
+      "벗겨짐·박리":   { "points": 73, "owlv2": 0.767, "yolo": 0.137 },
+      "오염·이물질":   { "points": 99, "owlv2": 0.808, "yolo": 0.141 }
+    },
+    "normal_separation": {
+      "결함99_박스당장": 13.0, "정상51_박스당장": 2.1, "순열_정상51": 7.4, "비대칭": 6.3,
+      "note": "셔플하면 정상에 박스를 쏟아붓는다 = 진짜 검출기라는 증거이자 이 프로젝트 최초의 정상/결함 분리 증거"
+    },
+    "caveats": [
+      "표본 150장으로 작다. 확장은 평가셋 §A 의 N_SAMPLE 만 올리면 된다",
+      "정답을 찍은 사람과 성능을 판단하는 사람이 같다 — 팀 교차 라벨링(WORKER/SHARD)으로 보강 필요",
+      "점 recall 은 IoU 0.1 기준 0.217 같은 옛 수치와 다른 잣대다. 같은 시험지의 YOLO 0.089 하고만 비교 가능",
+      "예산(장당 N박스) 모드로 재면 신호가 가려진다 — 정상 프레임에도 N박스를 강제해 무결함 오탐이 정확히 예산×51 이 된다. recall 0.738@10박스가 순열 배율 1.38× 로 폐기됐다. 반드시 점수 임계로 스윕할 것"
+    ]
+  },
+
+  "fixtures": {
+    "count": 0,
+    "requested_count": "20~30",
+    "material": "MyDrive/ext_evalset/images/ 150장(결함 99 · 정상 51) + labels_me.json. 그중 20~30장을 골라 detect() 출력을 굳히면 된다",
+    "tolerance_notes": [
+      "검출기 점수 허용오차는 CT(±0.01)보다 넓게 — OWLv2 점수가 transformers 후처리 구현에 민감할 수 있다. 단 게이트 판정(박스 개수 N≥8)과 verdict 는 완전 일치로 둘 것. 거기가 제품 동작이다",
+      "VLM 은 구조화 필드(판정·종류·등급)만 비교하고 관찰·근거 문장은 비교에서 뺄 것. do_sample=False 라 greedy 지만 토큰 단위 일치는 부동소수에 취약하다. 문장을 문자열 비교하면 픽스처가 매번 깨져 아무도 안 보게 된다"
+    ]
+  },
+
+  "known_gaps": [
+    { "id": 1, "항목": "ext_requirements.lock.txt + HF revision 고정", "주체": "우리", "심각도": "높음", "비고": "transformers 가 운영점을 조용히 무효화할 수 있다" },
+    { "id": 2, "항목": "6유형 → 계약 enum 매핑", "주체": "팀+계약", "심각도": "높음", "비고": "CRACK·SPOT 둘로는 안 담김" },
+    { "id": 3, "항목": "셀 판정 규칙 — PASS/REJECT vs 등급 기반", "주체": "팀+계약", "심각도": "높음", "비고": "무결함 셀이 없어 PASS/REJECT 성립 안 함" },
+    { "id": 4, "항목": "OWLv2 지연 (셀당 270프레임)", "주체": "우리", "심각도": "높음", "비고": "배포 가능 여부가 여기서 갈린다" },
+    { "id": 5, "항목": "배포 GPU 사양", "주체": "인프라", "심각도": "높음", "비고": "Qwen 7B bf16 ~16GB 수용 가능?" },
+    { "id": 6, "항목": "TOPK 운영값 (12 vs 실측 27.4)", "주체": "우리", "심각도": "보통", "비고": "실측 재현에 필요" },
+    { "id": 7, "항목": "크롭을 ai-infer 가 하는가", "주체": "팀", "심각도": "보통", "비고": "좌표 원복 책임 소재" },
+    { "id": 8, "항목": "골든 픽스처 20~30장", "주체": "우리", "심각도": "보통", "비고": "재료는 있음" },
+    { "id": 9, "항목": "EXT 출력 스키마 샘플", "주체": "우리", "심각도": "보통", "비고": "CT 대응물 없음" },
+    { "id": 10, "항목": "VLM 정상 판별력 (무결함 51장)", "주체": "우리", "심각도": "보통", "비고": "0804 §20.8 #1" },
+    { "id": 11, "항목": "source_commit", "주체": "우리", "심각도": "낮음" },
+    { "id": 12, "항목": "YOLO 대조군의 iou·max_det·half·SAHI postprocess", "주체": "우리", "심각도": "낮음" }
+  ],
+  "_actionable_without_decision": [1, 4, 6, 10, 12],
+
+  "control_track_yolo": {
+    "_status": "보존 — 지우지 않는다. 같은 시험지의 대조군이고 계약이 YOLO 를 전제하고 있어 되돌아갈 수도 있다",
+    "weight_file": "train_ext_crop_v5_idcap/best.pt",
+    "architecture": "yolo11m (detection)",
+    "classes": { "0": "Damaged", "1": "Pollution" },
+    "imgsz": 1280,
+    "structure": "클래스별 2패스 — 모델 하나, 추론 두 번",
+    "passes": [
+      { "class": "Pollution", "mode": "plain", "imgsz": 1280, "conf": 0.30, "근거": "conf 0.10~0.30 구간이 평탄해 성능 손실 0 으로 출력만 7.32→3.06개" },
+      { "class": "Damaged", "mode": "sahi", "slice": 640, "overlap": 0.2, "conf": 0.02, "근거": "recall 우선(최대 0.622). 정밀도는 후단이 담당" }
+    ],
+    "point_recall": 0.089,
+    "point_recall_thr": 0.05,
+    "point_recall_ratio": 2.07,
+    "warnings": [
+      "EXT 전체를 SAHI 로 돌리지 말 것 — plain 이 이미 R=1.0 이고 SAHI 는 오탐만 늘린다(0709 §6.1). Damaged 에만 켠다",
+      "conf 0.30/0.02 와 image-level F1 0.98 은 v3.4 계열(train_ext_v34) 기준으로 보이고, 점 recall 0.089 는 crop_v5_idcap 기준이다. 다른 가중치·다른 시험지라 섞어 읽으면 안 된다",
+      "F1 0.98 은 Pollution 이 캐리한 평균값이다 (클래스별 0.997 / 0.457)",
+      "iou·max_det·half·SAHI postprocess 미기록. conf 0.02 는 sahi 자동전환 구간이라 CT 에서 발견한 함정이 그대로 적용된다"
+    ]
+  }
+}
