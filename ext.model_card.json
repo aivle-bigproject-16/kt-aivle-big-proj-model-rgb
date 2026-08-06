@@ -4,7 +4,7 @@
   "modality": "RGB",
   "updated_at": "2026-08-06",
   "structure": "OWLv2(검출) → Qwen2.5-VL(해설) 2단. 학습 0회 · 라벨 0장 · 외부 API 0건",
-  "spec_source": "EXT_최종스펙.md (2026-08-06 실측 갱신). 이 JSON 의 모든 수치의 출처",
+  "spec_source": "EXT_SPEC.md — 재현 스펙 (코드 계약 · 질의어 전문 · _contract.json 전문 · 실행 순서)",
   "verification_notebook": "battery_ext_modelcard_check.ipynb (11셀, 2026-08-06 전량 실행)",
 
   "identity": {

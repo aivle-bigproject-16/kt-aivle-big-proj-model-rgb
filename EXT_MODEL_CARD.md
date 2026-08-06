@@ -4,7 +4,7 @@
 `ai-infer` 가 이 문서만 보고 재현할 수 있도록 요청서 템플릿 순서로 작성했습니다.
 
 - 기계가 읽을 형태 → [`ext.model_card.json`](ext.model_card.json)
-- 원본 스펙 → [`EXT_최종스펙.md`](EXT_최종스펙.md) (이 카드의 모든 수치의 출처)
+- 재현 스펙 (코드 계약·질의어 전문·실행 순서) → [`EXT_SPEC.md`](EXT_SPEC.md)
 - 검증 노트북 → `battery_ext_modelcard_check.ipynb` (11셀, 2026-08-06 전량 실행)
 
 | | |
@@ -780,7 +780,7 @@ VLM 정상 판별력 측정(§9.2 — 분리력 0 으로 확인, 그래서 안 �
 | 파일 | 역할 |
 | --- | --- |
 | `ext.model_card.json` | 이 문서의 기계 판독 형태 (S3 배포본) |
-| `EXT_최종스펙.md` | **이 카드의 원본 스펙** (10장) |
+| `EXT_SPEC.md` | **재현 스펙** — 코드 계약 · 질의어 전문 · `_contract.json` 전문 · 실행 순서 |
 | `battery_ext_modelcard_check.ipynb` | 모델카드 검증 (11셀) — revision · 환경 · 지연 · 운영점 · 픽스처 |
 | `battery_ext_unsup.ipynb` | §0 크롭본 / **§1 OWLv2** / **§4 Qwen 로드** (12셀) |
 | `battery_ext_evalset.ipynb` | 평가셋 — §A 표본 / §B 라벨링 / §C 채점 / §Y 리포트 JSON (30셀) |
