@@ -435,6 +435,9 @@ python ext_infer.py --verify-fixture     --fixture golden_fixture_deploy.json --
 때문입니다(카드 §6). 잘못 들이대면 도구가 `_meta.thr_gate` · `_meta.revision` 을 현재 `Config`
 와 대조해 🔴 로 막습니다.
 
+**실행 기록** — 2026-08-06 Colab GPU: **20/20 · 실패 0 · 경고 0**
+(`{OUT}/modelcard/fixture_verify_deploy.json`).
+
 판정은 **`gate` · `n_box` 완전 일치만 실패**, 좌표는 경고입니다 —
 `crop_box` 를 400 px 썸네일에서 계산하므로 Pillow 버전에 따라 1~5 px 흔들립니다(카드 §7.3).
 
