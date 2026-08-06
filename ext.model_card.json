@@ -1,440 +1,983 @@
 {
-  "schema_version": "1.0",
-  "task": "detect-ext",
-  "modality": "RGB",
-  "updated_at": "2026-08-06",
-  "structure": "OWLv2(검출) → Qwen2.5-VL(해설) 2단. 학습 0회 · 라벨 0장 · 외부 API 0건",
-  "spec_source": "EXT_SPEC.md — 재현 스펙 (코드 계약 · 질의어 전문 · _contract.json 전문 · 실행 순서)",
-  "verification_notebook": "battery_ext_modelcard_check.ipynb (11셀, 2026-08-06 전량 실행)",
-
-  "identity": {
-    "weight_file": null,
-    "_weight_file_note": "학습된 가중치가 없다. 사전학습 모델 2개를 그대로 쓴다.",
-    "detector_model_id": "google/owlv2-large-patch14-ensemble",
-    "detector_revision": "95e26936e865f87db1742128404b3c035d47d89d",
-    "vlm_model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
-    "vlm_revision": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
-    "weight_sha256": null,
-    "_sha256_substitute": "가중치 파일이 없으니 해시 대상도 없다. 대응물은 HF revision 고정이다 — from_pretrained(MODEL_ID) 만 쓰면 리포지토리가 갱신됐을 때 다른 가중치를 받아도 조용히 돈다. 두 모델 다 위 revision 을 코드에 박을 것.",
-    "_revision_verified": "2026-08-06 확인: 로컬 스냅샷 해시 = 원격 main 해시 (revisions.json). 지금까지 측정한 모든 수치가 이 두 리비전에서 나온 값이다.",
-    "train_run": null,
-    "labels_used": 0,
-    "training_runs": 0,
-    "source_repo": "aivle-bigproject-16/kt-aivle-big-proj-model-rgb",
-    "source_commit": null,
-    "trained_at": null
+ "schema_version": "1.0",
+ "task": "detect-ext",
+ "modality": "RGB",
+ "updated_at": "2026-08-06",
+ "structure": "OWLv2(검출) → Qwen2.5-VL(해설) 2단. 학습 0회 · 라벨 0장 · 외부 API 0건",
+ "deploy_artifact": "ext_infer.py — 배포 모듈 단일 파일. 런타임 값(임계·질의어·revision·계약서)의 원본은 이 파일이다.",
+ "spec_source": "EXT_SPEC.md — 재현 스펙 (코드 계약 · 질의어 전문 · _contract.json 전문 · 실행 순서)",
+ "verification_notebook": "battery_ext_modelcard_check.ipynb (11셀, 2026-08-06 전량 실행)",
+ "identity": {
+  "weight_file": null,
+  "_weight_file_note": "학습된 가중치가 없다. 사전학습 모델 2개를 그대로 쓴다.",
+  "detector_model_id": "google/owlv2-large-patch14-ensemble",
+  "detector_revision": "95e26936e865f87db1742128404b3c035d47d89d",
+  "vlm_model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "vlm_revision": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
+  "weight_sha256": null,
+  "_sha256_substitute": "가중치 파일이 없으니 해시 대상도 없다. 대응물은 HF revision 고정이다 — from_pretrained(MODEL_ID) 만 쓰면 리포지토리가 갱신됐을 때 다른 가중치를 받아도 조용히 돈다. 두 모델 다 위 revision 을 코드에 박을 것.",
+  "_revision_verified": "2026-08-06 확인: 로컬 스냅샷 해시 = 원격 main 해시 (revisions.json). 지금까지 측정한 모든 수치가 이 두 리비전에서 나온 값이다.",
+  "train_run": null,
+  "labels_used": 0,
+  "training_runs": 0,
+  "source_repo": "aivle-bigproject-16/kt-aivle-big-proj-model-rgb",
+  "source_commit": null,
+  "trained_at": null
+ },
+ "runtime": {
+  "python": "3.12.13",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "transformers": "5.13.1",
+  "transformers_supported_range": ">=5.13.1,<6",
+  "tokenizers": "0.22.2",
+  "huggingface-hub": "1.23.0",
+  "accelerate": "1.14.0",
+  "qwen-vl-utils": "0.0.14",
+  "numpy": "2.0.2",
+  "pillow": "11.3.0",
+  "measured_gpu": "NVIDIA A100-SXM4-80GB",
+  "driver": "580.82.07",
+  "lockfile": null,
+  "_lockfile_status": "값은 확보(env.json). 레포에 ext_requirements.lock.txt 로 커밋만 남았다.",
+  "_version_range_basis": "transformers 5.13.1 과 5.14.1 두 버전에서 운영점이 소수점까지 동일했다 (P 0.873 / R 0.995 / F1 0.930, 오탐 29 · 놓침 1). 둘 다 post_process_grounded_object_detection 을 쓴다. 이 범위 안에는 버전 위험이 없다는 실측이다.",
+  "_version_range_caveat": "검증된 것은 집계 지표(300장 운영점)까지다. 골든 픽스처는 매 실행 재생성되므로 박스 단위 교차버전 일치는 미검증. 엄밀히 보려면 픽스처 파일을 버전별로 보관하고 fixtures 회귀만 돌릴 것.",
+  "_risk": "후처리 API 이름이 버전 간 다르다 (post_process_grounded_object_detection ↔ post_process_object_detection). 코드는 지연 평가로 둘 다 처리한다. 더 위험한 건 조용한 쪽 — 후처리 구현이 바뀌어 점수 스케일이 달라지면 thr 0.08·0.12 운영점이 에러 없이 무효가 된다.",
+  "gpu_requirement": "Qwen2.5-VL-7B bf16 ~16GB + OWLv2-large 별도. 측정은 A100 80GB. 배포 GPU 가 T4/L4 면 수용 가능 여부 확인 필요 (known_gaps #4)"
+ },
+ "input": {
+  "source_spec": {
+   "width": 1920,
+   "height": 1080,
+   "naming": "RGB_cell_cylindrical",
+   "id_count": 759
   },
-
-  "runtime": {
-    "python": "3.12.13",
-    "torch": "2.11.0+cu128",
-    "cuda": "12.8",
-    "transformers": "5.13.1",
-    "transformers_supported_range": ">=5.13.1,<6",
-    "tokenizers": "0.22.2",
-    "huggingface-hub": "1.23.0",
-    "accelerate": "1.14.0",
-    "qwen-vl-utils": "0.0.14",
-    "numpy": "2.0.2",
-    "pillow": "11.3.0",
-    "measured_gpu": "NVIDIA A100-SXM4-80GB",
-    "driver": "580.82.07",
-    "lockfile": null,
-    "_lockfile_status": "값은 확보(env.json). 레포에 ext_requirements.lock.txt 로 커밋만 남았다.",
-    "_version_range_basis": "transformers 5.13.1 과 5.14.1 두 버전에서 운영점이 소수점까지 동일했다 (P 0.873 / R 0.995 / F1 0.930, 오탐 29 · 놓침 1). 둘 다 post_process_grounded_object_detection 을 쓴다. 이 범위 안에는 버전 위험이 없다는 실측이다.",
-    "_version_range_caveat": "검증된 것은 집계 지표(300장 운영점)까지다. 골든 픽스처는 매 실행 재생성되므로 박스 단위 교차버전 일치는 미검증. 엄밀히 보려면 픽스처 파일을 버전별로 보관하고 fixtures 회귀만 돌릴 것.",
-    "_risk": "후처리 API 이름이 버전 간 다르다 (post_process_grounded_object_detection ↔ post_process_object_detection). 코드는 지연 평가로 둘 다 처리한다. 더 위험한 건 조용한 쪽 — 후처리 구현이 바뀌어 점수 스케일이 달라지면 thr 0.08·0.12 운영점이 에러 없이 무효가 된다.",
-    "gpu_requirement": "Qwen2.5-VL-7B bf16 ~16GB + OWLv2-large 별도. 측정은 A100 80GB. 배포 GPU 가 T4/L4 면 수용 가능 여부 확인 필요 (known_gaps #4)"
+  "color_space": "RGB",
+  "frames_per_cell": 270,
+  "model_input": "셀 크롭 → 정사각 패딩",
+  "measured_crop_size": [
+   1464,
+   895
+  ],
+  "imgsz": null,
+  "_imgsz_note": "Owlv2Processor 가 처리한다. ultralytics 식 imgsz 개념이 없다.",
+  "tiles": 1,
+  "_tiles_note": "요청서 §3 sahi.enabled 대응 항목. SAHI 자체를 안 쓴다. 1 = 크롭 통짜. 작은 결함을 놓치면 3(세로 3등분)이 업그레이드 경로. 현재 미사용",
+  "cell_crop": {
+   "enabled": true,
+   "_answers_request": "요청서 §3 'RGB 도 ROI 전처리가 있는가' → 있다. '이미지 = ROI = 전체 프레임' 이라던 예전 문서는 v4.2 부터 맞지 않는다.",
+   "defined_in": "battery_ext_crop_retrain.ipynb §1 (학습·추론 공용 함수)",
+   "produced_by": "battery_ext_unsup.ipynb §0",
+   "method": "HSV 채도 기반 (배경=무채색 · 셀=유채색 전제)",
+   "sat_threshold": 40,
+   "density_threshold": 0.1,
+   "pad": 0.1,
+   "_pad_basis": "결함 보존 Damaged 100% / Pollution 99.7%",
+   "area_range": [
+    0.02,
+    0.9
+   ],
+   "fallback": "채도로 안 갈리면 밝기(V). 추정 실패 시 원본 전체(0,0,1,1) — 파이프라인을 멈추지 않는다",
+   "size_fixed": false,
+   "coordinate_warning": "리포트 좌표는 원본 기준이어야 한다. 크롭 좌표를 그대로 내보내면 프론트에서 박스가 어긋난다. to_orig_coords() 로 되돌릴 것(왕복 변환 자체 검증 있음).",
+   "_ownership_open": "ai-infer 가 원본을 받아 크롭하는지 크롭본을 받는지 미정 (known_gaps #5)"
   },
-
-  "input": {
-    "source_spec": { "width": 1920, "height": 1080, "naming": "RGB_cell_cylindrical", "id_count": 759 },
-    "color_space": "RGB",
-    "frames_per_cell": 270,
-    "model_input": "셀 크롭 → 정사각 패딩",
-    "measured_crop_size": [1464, 895],
-    "imgsz": null,
-    "_imgsz_note": "Owlv2Processor 가 처리한다. ultralytics 식 imgsz 개념이 없다.",
-    "tiles": 1,
-    "_tiles_note": "요청서 §3 sahi.enabled 대응 항목. SAHI 자체를 안 쓴다. 1 = 크롭 통짜. 작은 결함을 놓치면 3(세로 3등분)이 업그레이드 경로. 현재 미사용",
-
-    "cell_crop": {
-      "enabled": true,
-      "_answers_request": "요청서 §3 'RGB 도 ROI 전처리가 있는가' → 있다. '이미지 = ROI = 전체 프레임' 이라던 예전 문서는 v4.2 부터 맞지 않는다.",
-      "defined_in": "battery_ext_crop_retrain.ipynb §1 (학습·추론 공용 함수)",
-      "produced_by": "battery_ext_unsup.ipynb §0",
-      "method": "HSV 채도 기반 (배경=무채색 · 셀=유채색 전제)",
-      "sat_threshold": 40,
-      "density_threshold": 0.10,
-      "pad": 0.10,
-      "_pad_basis": "결함 보존 Damaged 100% / Pollution 99.7%",
-      "area_range": [0.02, 0.90],
-      "fallback": "채도로 안 갈리면 밝기(V). 추정 실패 시 원본 전체(0,0,1,1) — 파이프라인을 멈추지 않는다",
-      "size_fixed": false,
-      "coordinate_warning": "리포트 좌표는 원본 기준이어야 한다. 크롭 좌표를 그대로 내보내면 프론트에서 박스가 어긋난다. to_orig_coords() 로 되돌릴 것(왕복 변환 자체 검증 있음).",
-      "_ownership_open": "ai-infer 가 원본을 받아 크롭하는지 크롭본을 받는지 미정 (known_gaps #5)"
-    },
-
-    "square_padding": {
-      "required": true,
-      "fill": [0, 0, 0],
-      "anchor": "top-left",
-      "target_sizes": "(S, S) — S = max(W, H)",
-      "why": "OWLv2 전처리가 이미지를 정사각으로 패딩한다. 직사각을 그대로 넣으면 반환 좌표가 패딩된 캔버스 기준이라 박스가 통째로 어긋난다. 에러는 안 나고 숫자만 틀린다. 우리가 먼저 패딩해 내부 패딩을 무연산으로 만든다.",
-      "_latency_cost": "1464×895 가 1464² 이 되어 연산량 1.6배. performance.latency 참조"
-    },
-
-    "vlm_panel": {
-      "margin": 0.35,
-      "panel_px": 336,
-      "cap_zone": 0.22,
-      "layout": "[ 기준 패치 | 확대 크롭 ] 한 장",
-      "reference_body": "같은 셀에서 박스가 가장 먼 곳을 같은 크기로",
-      "reference_cap": "사람이 확인한 정상 캡 갤러리 16장 (셀이 달라도 같은 금속이라 셀 간 비교 성립)",
-      "_thumbnail_warning": "PIL.thumbnail() 은 확대를 안 한다. 작은 크롭이 336px 칸 구석에 붙고 나머지가 흰 여백이 되어 VLM 이 사실상 빈 칸을 본다. resize 를 쓸 것."
-    }
+  "square_padding": {
+   "required": true,
+   "fill": [
+    0,
+    0,
+    0
+   ],
+   "anchor": "top-left",
+   "target_sizes": "(S, S) — S = max(W, H)",
+   "why": "OWLv2 전처리가 이미지를 정사각으로 패딩한다. 직사각을 그대로 넣으면 반환 좌표가 패딩된 캔버스 기준이라 박스가 통째로 어긋난다. 에러는 안 나고 숫자만 틀린다. 우리가 먼저 패딩해 내부 패딩을 무연산으로 만든다.",
+   "_latency_cost": "1464×895 가 1464² 이 되어 연산량 1.6배. performance.latency 참조"
   },
-
-  "inference": {
-    "batch_size": 16,
-    "_batch_note": "실측 최적. 다만 bs=1 대비 7% 만 빠르다 — 연산 포화 (performance.latency)",
-    "topk": 50,
-    "_topk_note": "내부 수집 상한. 사후 필터용으로 넓게 수집한다. confidence 산식(§confidence_formula)이 이 구조에 의존한다",
-    "drop_neg": true,
-    "band_filter": false,
-    "_band_filter_note": "기각. N≥12 에서 ON/OFF 동일, N≥8 에서 놓침 0→1. 상방 없음",
-    "dtype": "fp32",
-    "postprocess_api": "post_process_grounded_object_detection 우선, 없으면 post_process_object_detection 폴백 (지연 평가로 선택)",
-
-    "stage1_gate": {
-      "role": "프레임 결함/정상 판정 — 판정에 쓰이는 건 이것뿐",
-      "threshold": 0.08,
-      "min_boxes": 8,
-      "precision": 0.873,
-      "recall": 0.995,
-      "f1": 0.930,
-      "false_positives": 29,
-      "misses": 1,
-      "eval_n": 300,
-      "note": "박스 개수만 센다. 태그도 종류도 안 쓴다. 그래서 유형 분류가 실패해도 판정 성능은 영향을 받지 않는다."
-    },
-    "stage2_locate": {
-      "role": "리포트에 실을 박스 선정",
-      "threshold": 0.12,
-      "top_n": 6,
-      "point_recall": 0.818,
-      "permutation": 0.328,
-      "ratio": 2.51,
-      "note": "박스 위치가 맞아야 리포트가 성립한다. 두 단의 임계를 하나로 통일하면 안 된다."
-    },
-    "stage3_vlm": {
-      "_status": "선택 단계. 판정에 쓰이지 않는다. 통째로 빼도 게이트 성능은 동일하다",
-      "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
-      "revision": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
-      "dtype": "bfloat16",
-      "device_map": "auto",
-      "mode": "per_item",
-      "_mode_note": "montage(SoM 번호 참조)는 실패했다 — 작은 VLM 이 번호↔칸 매핑에 약해 캡이 없는 칸을 '금속캡 각인'이라 하고 근거 문장이 9칸에 글자까지 동일했다. per_item 은 칸당 따로 물어 매핑 문제가 원천적으로 없다.",
-      "do_sample": false,
-      "max_new_tokens": 120,
-      "prompt_version": "v8",
-      "output_lines": ["종류: [0-6]", "크기: [A-D]", "본것: 자유 문장 (140자 절단)"],
-      "parse_fallback": "정규식으로 못 읽으면 종류 0(정상)으로 처리 — 모르는 걸 결함으로 치지 않는다",
-      "_prompt_rules": [
-        "프롬프트에 예시·기준표·특징 목록을 넣지 말 것 — 7B 는 눈에 띄는 텍스트를 그대로 출력에 복사한다(5회 확인). 틀을 하나 없애면 다음으로 눈에 띄는 텍스트를 베낀다. '덜 보여준다'가 아니라 '베낄 것을 아예 남기지 않는다'가 규칙",
-        "한국어를 생성시키지 말 것 — v7 에서 '베지먼트·베져짐·베기짐' 118건(19%)이 '벗겨짐'의 깨진 토큰이었다. 번호·알파벳으로만 답하게 하니 0건",
-        "셀 전체를 문맥으로 주지 말 것(v9) — 길쭉한 원통의 세로 결·랩 주름이 '선 = 긁힘'으로 프라이밍해 정확도가 0.115 로 붕괴했다"
-      ]
-    },
-
-    "queries": {
-      "_role": "질의어가 이 파이프라인의 실질 '라벨'이다. 리스트 한 줄을 바꾸면 찾는 대상이 바뀐다.",
-      "defect_query_count": 25,
-      "distractor_query_count": 10,
-      "total": 35,
-      "_latency_link": "이 수가 지연에 직접 영향한다 — 질의 35개를 매 이미지마다 재인코딩한다",
-      "design_rules": [
-        "영어 · 짧은 명사구 (문장이나 형용사 나열은 신호가 희석)",
-        "추상어(defect·anomaly)는 안 먹는다 — 눈에 보이는 물체/현상으로",
-        "한 유형에 영어 표현 여러 개를 붙여 OR 로",
-        "한국어 키는 평가셋 유형과 같은 이름이어야 유형별 recall 이 붙는다"
-      ],
-      "query_map": {
-        "녹·부식": ["rust", "orange brown discoloration", "brown stain on surface", "oxidation on surface", "reddish brown spot"],
-        "벗겨짐·박리": ["peeling plastic wrap", "peeled off label", "exposed metal under wrapper", "wrapper coming off", "peeling film edge"],
-        "파손·찢김": ["tear in plastic film", "crack on surface", "puncture hole", "dent"],
-        "긁힘·스크래치": ["scratch", "scratch mark", "scratched metal surface", "scuff mark"],
-        "들뜸": ["air bubble under film", "wrinkled plastic wrap", "lifted film edge"],
-        "오염·이물질": ["dirt stain", "smudge", "white residue", "foreign particle on surface"]
-      },
-      "neg_map": {
-        "정상:인쇄·각인": ["printed text", "printed letters on label", "engraved serial number"],
-        "정상:반사": ["light reflection", "specular highlight"],
-        "정상:금속캡": ["metal cap", "battery terminal"],
-        "정상:테두리": ["bottom edge of cylinder", "rim of metal can", "silhouette edge"]
-      },
-      "drop_tags": ["정상:인쇄·각인", "정상:반사", "정상:테두리"],
-      "_keep_metal_cap": "정상:금속캡 은 이름만 붙이고 버리지 않는다. 구조물 판정으로 지우면 오탐 5개 지우고 진짜 결함 9개를 잃는다(순손실). 캡 위의 부식은 결함이다. DROP_TAGS 에 추가하지 말 것.",
-      "_query_swap_lesson": "녹 질의를 금속 지향 → 색·산화 지향으로 바꾸니 녹 태그 정확도 0.031 → 0.225 (순열 2.46×), 재학습 0회. 그런데 게이트·검출률은 소수점까지 동일했다. 질의어는 '찾기'가 아니라 '이름'만 바꾼다."
-    }
+  "vlm_panel": {
+   "margin": 0.35,
+   "panel_px": 336,
+   "cap_zone": 0.22,
+   "layout": "[ 기준 패치 | 확대 크롭 ] 한 장",
+   "reference_body": "같은 셀에서 박스가 가장 먼 곳을 같은 크기로",
+   "reference_cap": "사람이 확인한 정상 캡 갤러리 16장 (셀이 달라도 같은 금속이라 셀 간 비교 성립)",
+   "_thumbnail_warning": "PIL.thumbnail() 은 확대를 안 한다. 작은 크롭이 336px 칸 구석에 붙고 나머지가 흰 여백이 되어 VLM 이 사실상 빈 칸을 본다. resize 를 쓸 것."
   },
-
-  "output": {
-    "detector_tuple": "(x1, y1, x2, y2, score, tag, query)",
-    "bbox_format": "xyxy",
-    "coordinate_reference": "crop_image",
-    "_coordinate_note": "타일 오프셋은 복원되어 있으나 셀 크롭 기준이다. 원본 기준 리포트는 to_orig_coords() 필요.",
-    "_score_warning": "score 는 질의마다 스케일이 다르다. 전역 argmax 를 하므로 tag 는 '가장 잘 맞는 결함'이 아니라 '가장 점수가 잘 나오는 질의'다. 게이트는 개수만 세므로 무관하지만 tag 를 유형으로 신뢰하면 안 된다.",
-    "defect_types": ["녹·부식", "벗겨짐·박리", "파손·찢김", "긁힘·스크래치", "들뜸", "오염·이물질"],
-
-    "class_map": null,
-    "_class_map_gap": "계약 §6.5 RGB enum 은 CRACK·SPOT 2종인데 이 파이프라인은 6종이다. 파손·찢김→CRACK, 오염·이물질→SPOT 까지는 자연스럽지만 녹·부식(사람 점 최다)·긁힘·스크래치·벗겨짐·박리·들뜸 이 갈 곳이 없다. 선택지는 ①6종을 2종으로 뭉갠다(정보 손실) ②계약 enum 에 CORROSION·PEELING 을 추가한다. 계약 쪽 결정 필요 (known_gaps #1).",
-    "_class_map_scope": "판정(게이트)은 이 결정과 무관하게 이미 동작한다. 게이트는 태그를 안 쓴다. 막히는 건 리포트의 유형 표기뿐이다.",
-
-    "report_json": {
-      "_premise": "리포트를 쓰는 것은 LLM 이고 이미지를 볼 수 없다. 우리가 틀린 값을 넘기면 LLM 은 그대로 사실로 받아 적는다. 값만 넘기지 않고 그 값이 어디까지 검증됐는지를 같이 넘긴다.",
-      "layout": {
-        "_contract.json": "LLM 프롬프트 맨 앞에 붙일 계약서 (1개). 없이 주면 LLM 이 유형후보 1등을 확정으로 써버린다",
-        "cell_XXXX.json": "셀당 1개"
-      },
-      "path": "{OUT}/report_input/",
-      "fields": {
-        "셀": { "type": "str", "값": "파일명 cylindrical_(\\d+)_ 에서 추출", "신뢰": null },
-        "검사_프레임수": { "type": "int", "신뢰": null },
-        "프레임[].파일": { "type": "str", "신뢰": null },
-        "프레임[].판정": { "type": "str", "값": ["결함", "정상"], "신뢰": "높음", "근거": "300장 F1 0.930" },
-        "프레임[].판정_근거": { "type": "obj", "값": "{임계: 0.08, 박스수: int, 기준: '8개 이상'}", "신뢰": null },
-        "결함[].위치.구역": { "type": "str", "값": ["금속캡", "몸통"], "신뢰": "높음" },
-        "결함[].위치.셀_상단에서": { "type": "float", "값": "0.0~1.0", "신뢰": "높음" },
-        "결함[].위치.bbox": { "type": "int[4]", "값": "[x1,y1,x2,y2] 원본 픽셀", "신뢰": "높음" },
-        "결함[].크기.셀면적비_퍼센트": { "type": "float", "값": "박스면적/셀면적×100", "신뢰": "중간" },
-        "결함[].크기.구분": { "type": "str", "값": ["큼(≥1.0%)", "작음"], "신뢰": "중간" },
-        "결함[].유형후보": { "type": "str[]", "값": "순위 있는 이름 목록. 점수 없음", "신뢰": "낮음" },
-        "결함[].유형_주의": { "type": "str", "값": "검증 미통과. 확정 표현 금지", "신뢰": null }
-      },
-      "defect_array_rule": "판정 == '결함' 일 때만 채워지고, 프레임당 최대 6개 (점수 상위)",
-      "_no_type_score": "초기 버전은 유형후보에 점수를 함께 냈다(['긁힘·스크래치', 0.84]). 폐기했다 — 0.85~1.01 구간이 176/210(84%)이고 평균 점수 0.954 인데 실제 적중은 0.477 이었다(−0.477). LLM 은 그림을 못 보므로 그 숫자를 '확실히 녹입니다'로 옮긴다 = 없는 확신을 만들어 파는 것. 순위만 넘긴다."
-    },
-
-    "grade": {
-      "computed_by": "code",
-      "formula": "0 if kind == 0 else min(5, SIZE_G[size] + (1 if kind in {2,3} else 0))",
-      "size_map": { "A": 4, "B": 3, "C": 2, "D": 1 },
-      "kind_up": [2, 3],
-      "_kind_up_why": "벗겨짐·파손은 금속 노출로 이어진다",
-      "_why_code_not_vlm": "등급은 '얼마나 심한가'라는 주관 판단이라 모델이 가장 쉽게 뭉갠다(실제로 뭉갰다). 크기·종류는 눈에 보이는 사실이라 훨씬 안정적이고, 이 규칙은 모델 카드에 그대로 적을 수 있으며 같은 입력이면 같은 등급이 나온다.",
-      "exported": false,
-      "_why_not_exported": "결함 프레임 박스의 19.7% 가 4등급↑ 인데 무결함 프레임은 20.2% 로 분리력이 0 이다. report_json 스키마에 등급 필드가 없는 이유."
-    },
-
-    "verdict_rule": null,
-    "_verdict_gap": "셀 단위 PASS/REJECT 가 성립하지 않는다. 표면이 가장 고른 셀 10개를 육안 확인했더니 10개 전부 결함이었고, 매니페스트가 '무결함'이라 표시한 셀 2개(515·581)도 둘 다 오염이 실재했다. 이 데이터에 무결함 셀이 사실상 없어 계약 §12.1 의 셀 단위 판정은 분모가 없다. 프레임 단위로는 사람이 검증한 무결함 99장이 있어 게이트 P/R 은 잴 수 있다. 계약 쪽 논의 필요 (known_gaps #3)."
+  "_JPEG_GENERATION_CONTRACT": {
+   "요구": "카메라 원본 JPEG 바이트를 그대로 넘길 것. 리사이즈·품질 변경·재저장·썸네일 경유 금지.",
+   "근거_박스per장": {
+    "원본_1세대": 33.1,
+    "크롭후_재저장_2세대": 26.4,
+    "평가셋_크롭본_2세대": 21.6
+   },
+   "영향": "재압축은 미세 질감을 뭉갠다. 그 질감이 저점수 검출을 만들므로 박스가 줄고 운영점이 깨진다.",
+   "검증": "배포 크롭을 품질 92 로 재저장하니 평가셋 수치에 붙었다 (차이 53% → 22%).",
+   "설계_연결": "파이프라인이 크롭을 메모리에서만 다루는 이유다 — 디스크 경유는 재인코딩 위험."
   },
-
-  "confidence_formula": {
-    "_answers_request": "요청서 §7 — 계약 §12.1 최상위 confidence 산식",
-    "scalar": "s8 = 8번째로 높은 박스 점수",
-    "_why": "게이트는 '점수 ≥ 0.08 인 박스가 8개 이상'이고, 이 조건은 s8 ≥ 0.08 과 동치다. 판정을 뒤집는 유일한 값이 s8 이라 CT 의 '검출 confidence' 에 정확히 대응한다.",
-    "REJECT": "s8 (≥ 0.08)",
-    "PASS_with_candidates": "1 − s8 (s8 < 0.08)",
-    "PASS_no_candidates": "1.0 — 박스가 8개 미만이면 s8 = 0 이라 자동으로 1.0",
-    "extra_cost": "없음",
-    "_why_free": "topk 50 으로 넓게 수집한 뒤 점수 임계로 사후 필터하는 구조라 s8 은 이미 계산된 값 중 8번째를 읽는 것이다. 재추론이 필요 없다. 슬라이스 병합(NMS/NMM)이 없어 저점수 박스가 고점수 박스의 생존에 영향을 줄 수 없다 — CT 가 겪은 문제 자체가 없다.",
-    "caveats": [
-      "topk 가 8 이상이어야 한다. 현재 50 이라 여유롭지만 낮추면 s8 자체가 안 나온다",
-      "위는 파이프라인 구조에서 나온 추론이지 별도 실측이 아니다. 검증은 싸다 — detect() 를 thr=0.0 으로 돌려 s8 을 뽑고, s8 ≥ 0.08 판정이 골든 픽스처의 게이트 판정 20건과 전부 일치하는지 보면 확정이다"
+  "accepted_types": [
+   "파일 경로(str/Path)",
+   "bytes",
+   "PIL.Image"
+  ],
+  "expects": "원본 이미지(1920x1080). 셀 크롭은 파이프라인 내부에서 수행한다."
+ },
+ "inference": {
+  "batch_size": 16,
+  "_batch_note": "실측 최적. 다만 bs=1 대비 7% 만 빠르다 — 연산 포화 (performance.latency)",
+  "topk": 50,
+  "_topk_note": "내부 수집 상한. 사후 필터용으로 넓게 수집한다. confidence 산식(§confidence_formula)이 이 구조에 의존한다",
+  "drop_neg": true,
+  "band_filter": false,
+  "_band_filter_note": "기각. N≥12 에서 ON/OFF 동일, N≥8 에서 놓침 0→1. 상방 없음",
+  "dtype": "fp32",
+  "postprocess_api": "post_process_grounded_object_detection 우선, 없으면 post_process_object_detection 폴백 (지연 평가로 선택)",
+  "stage1_gate": {
+   "role": "프레임 결함/정상 판정 — 판정에 쓰이는 건 이것뿐",
+   "threshold": 0.1,
+   "min_boxes": 8,
+   "precision": 0.855,
+   "recall": 1.0,
+   "f1": 0.922,
+   "false_positives": 34,
+   "misses": 0,
+   "eval_n": 300,
+   "note": "박스 개수만 센다. 태그도 종류도 안 쓴다. 그래서 유형 분류가 실패해도 판정 성능은 영향을 받지 않는다.",
+   "_path": "배포 경로(원본 → 셀 크롭 → 검출)에서 잰 값이다.",
+   "_threshold_change": "평가 경로(이미 잘린 크롭 · JPEG 2세대)에서는 0.08 이었다. 배포 경로는 입력이 JPEG 1세대라 더 선명해 박스가 53% 더 나온다(33.1 vs 21.6 박스/장) → 0.10 으로 재교정. 0.08 을 그대로 쓰면 오탐이 29 → 71 로 뛴다."
+  },
+  "stage2_locate": {
+   "role": "리포트에 실을 박스 선정",
+   "threshold": 0.12,
+   "top_n": 6,
+   "point_recall": 0.818,
+   "permutation": 0.328,
+   "ratio": 2.51,
+   "note": "박스 위치가 맞아야 리포트가 성립한다. 두 단의 임계를 하나로 통일하면 안 된다."
+  },
+  "stage3_vlm": {
+   "_status": "선택 단계. 판정에 쓰이지 않는다. 통째로 빼도 게이트 성능은 동일하다",
+   "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+   "revision": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
+   "dtype": "bfloat16",
+   "device_map": "auto",
+   "mode": "per_item",
+   "_mode_note": "montage(SoM 번호 참조)는 실패했다 — 작은 VLM 이 번호↔칸 매핑에 약해 캡이 없는 칸을 '금속캡 각인'이라 하고 근거 문장이 9칸에 글자까지 동일했다. per_item 은 칸당 따로 물어 매핑 문제가 원천적으로 없다.",
+   "do_sample": false,
+   "max_new_tokens": 120,
+   "prompt_version": "v8",
+   "output_lines": [
+    "종류: [0-6]",
+    "크기: [A-D]",
+    "본것: 자유 문장 (140자 절단)"
+   ],
+   "parse_fallback": "정규식으로 못 읽으면 종류 0(정상)으로 처리 — 모르는 걸 결함으로 치지 않는다",
+   "_prompt_rules": [
+    "프롬프트에 예시·기준표·특징 목록을 넣지 말 것 — 7B 는 눈에 띄는 텍스트를 그대로 출력에 복사한다(5회 확인). 틀을 하나 없애면 다음으로 눈에 띄는 텍스트를 베낀다. '덜 보여준다'가 아니라 '베낄 것을 아예 남기지 않는다'가 규칙",
+    "한국어를 생성시키지 말 것 — v7 에서 '베지먼트·베져짐·베기짐' 118건(19%)이 '벗겨짐'의 깨진 토큰이었다. 번호·알파벳으로만 답하게 하니 0건",
+    "셀 전체를 문맥으로 주지 말 것(v9) — 길쭉한 원통의 세로 결·랩 주름이 '선 = 긁힘'으로 프라이밍해 정확도가 0.115 로 붕괴했다"
+   ]
+  },
+  "queries": {
+   "_role": "질의어가 이 파이프라인의 실질 '라벨'이다. 리스트 한 줄을 바꾸면 찾는 대상이 바뀐다.",
+   "defect_query_count": 25,
+   "distractor_query_count": 10,
+   "total": 35,
+   "_latency_link": "이 수가 지연에 직접 영향한다 — 질의 35개를 매 이미지마다 재인코딩한다",
+   "design_rules": [
+    "영어 · 짧은 명사구 (문장이나 형용사 나열은 신호가 희석)",
+    "추상어(defect·anomaly)는 안 먹는다 — 눈에 보이는 물체/현상으로",
+    "한 유형에 영어 표현 여러 개를 붙여 OR 로",
+    "한국어 키는 평가셋 유형과 같은 이름이어야 유형별 recall 이 붙는다"
+   ],
+   "query_map": {
+    "녹·부식": [
+     "rust",
+     "orange brown discoloration",
+     "brown stain on surface",
+     "oxidation on surface",
+     "reddish brown spot"
+    ],
+    "벗겨짐·박리": [
+     "peeling plastic wrap",
+     "peeled off label",
+     "exposed metal under wrapper",
+     "wrapper coming off",
+     "peeling film edge"
+    ],
+    "파손·찢김": [
+     "tear in plastic film",
+     "crack on surface",
+     "puncture hole",
+     "dent"
+    ],
+    "긁힘·스크래치": [
+     "scratch",
+     "scratch mark",
+     "scratched metal surface",
+     "scuff mark"
+    ],
+    "들뜸": [
+     "air bubble under film",
+     "wrinkled plastic wrap",
+     "lifted film edge"
+    ],
+    "오염·이물질": [
+     "dirt stain",
+     "smudge",
+     "white residue",
+     "foreign particle on surface"
     ]
-  },
-
-  "performance": {
-    "eval_set": {
-      "images": 300,
-      "points": 684,
-      "clean_frames": 99,
-      "composition": "1차 150장(seed 42) + 2차 150장(seed 2026, 1차와 겹침 0)",
-      "sampling": "셀당 최대 2장 층화, split=val 고정",
-      "_why_2_per_cell": "한 셀의 270프레임은 서로 닮아 상관 표본이 된다(유효 표본 수가 준다)",
-      "labeler": "사람(사용자) 클릭 — 결함 중심에 점 하나",
-      "_caveat": "정답을 찍은 사람과 성능을 판단하는 사람이 같다. 팀 교차 라벨링으로 보강 예정"
-    },
-    "metric": "점 recall — 예측 박스 안에 사람 점이 들어가면 적중",
-    "_why_point_not_iou": "기존 GT 는 결함 전체가 아니라 파편이라, 결함을 정확히 잡을수록 면적이 커져 IoU 가 떨어진다. 점은 조각이 될 수 없고 크기 논쟁도 없다. IoU 를 쓰지 않는다.",
-    "control": {
-      "method": "순열 — 이미지 이름을 섞어 남의 이미지 박스로 채점한다. 박스를 많이(또는 크게) 뿌리면 우연히 맞기 때문",
-      "rules": {
-        "recall·정확도": "배율 ≥ 2",
-        "F1 스윕": "순열 p < 0.01 & F1 > p95 (순열 바닥이 기저율 ~0.5 이라 배율 상한이 2.0)",
-        "다중클래스 정확도": "최빈 유형 베이스라인 대비"
-      },
-      "_most_expensive_lesson": "순열 대조를 통과해도 '가장 흔한 유형 찍기'보다 못할 수 있다. 실측: 검출기 태그 0.267 < 무조건-녹 0.376.",
-      "preregistration": "지표와 폐기 규칙을 예측을 보기 전에 고정한다. 실제로 recall 0.738(순열 1.38×)과 recall 0.993(순열 1.24×)을 이 규칙으로 폐기했다."
-    },
-
-    "operating_points": [
-      { "설정": "thr0.08 N≥12", "P": 0.975, "R": 0.965, "F1": 0.970, "오탐": 5, "놓침": 7, "note": "F1 최대" },
-      { "설정": "thr0.08 N≥8", "P": 0.873, "R": 0.995, "F1": 0.930, "오탐": 29, "놓침": 1, "채택": true },
-      { "설정": "thr0.08 N≥5", "P": 0.776, "R": 1.000, "F1": 0.874, "오탐": 58, "놓침": 0, "note": "놓침 0 이 계약 요구사항이면 여기로. 재학습 없이 상수 하나" },
-      { "설정": "thr0.12 N≥5", "P": 0.969, "R": 0.925, "F1": 0.947, "오탐": 6, "놓침": 15 }
+   },
+   "neg_map": {
+    "정상:인쇄·각인": [
+     "printed text",
+     "printed letters on label",
+     "engraved serial number"
     ],
-    "_operating_point_rationale": "F1 최대점(0.970)이 아니라 놓침이 최소인 지점을 택했다. 불량 게이트에서 놓침 7장(결함 셀 7개 통과)은 오탐 29장(사람이 29장 더 봄)과 비교 대상이 아니다.",
-    "robustness": {
-      "150장_0805": { "P": 0.876, "R": 1.000, "F1": 0.934 },
-      "300장_0806": { "P": 0.873, "R": 0.995, "F1": 0.930 },
-      "note": "표본이 2배가 됐는데 F1 이 0.004 밖에 안 움직였다 = 운영점이 견고하다. 다만 recall 이 1.000 → 0.995(놓침 1건)로 내려갔으므로 150장 숫자를 계속 쓰지 않는다."
-    },
-
-    "by_type": {
-      "_basis": "이 표의 사람 점 합이 299 라 1차 150장(점 302) 기준이다. 300장 재집계는 안 했다 (known_gaps #8). 게이트·점 recall 수치는 300장 기준이 맞다.",
-      "_meaning": "'찾았는가'이지 '이름을 맞혔는가'가 아니다",
-      "녹·부식":       { "points": 82, "owlv2": 0.890, "yolo": 0.024 },
-      "긁힘·스크래치": { "points": 30, "owlv2": 0.867, "yolo": 0.000 },
-      "들뜸":         { "points": 15, "owlv2": 0.600, "yolo": 0.000 },
-      "벗겨짐·박리":   { "points": 73, "owlv2": 0.767, "yolo": 0.137 },
-      "오염·이물질":   { "points": 99, "owlv2": 0.808, "yolo": 0.141 }
-    },
-    "normal_separation": {
-      "결함_박스당장": 13.0, "무결함_박스당장": 2.1, "비대칭": 6.3, "thr": 0.12,
-      "note": "이 프로젝트 최초의 정상/결함 분리 증거"
-    },
-    "vlm_size_correlation": { "rho": 0.297, "permutation_runs": 1000, "p": 0.001 },
-
-    "latency": {
-      "_status": "🔴 배포 요구를 크게 초과한다",
-      "target_per_cell_sec": 4,
-      "frames_per_cell": 270,
-      "stage1_owlv2": [
-        { "batch": 1,  "ms_per_image": [380, 377], "min_per_cell": [1.71, 1.70] },
-        { "batch": 4,  "ms_per_image": [355, 346], "min_per_cell": [1.60, 1.56] },
-        { "batch": 8,  "ms_per_image": [357, 343], "min_per_cell": [1.61, 1.54] },
-        { "batch": 16, "ms_per_image": [353, 341], "min_per_cell": [1.59, 1.53], "채택": true }
-      ],
-      "stage1_verdict": "셀당 1.53~1.59분 = 목표 4초 대비 약 23배. 전량 추론은 불가.",
-      "_saturated": "배치를 16배 키워도 7% 밖에 안 빨라진다 = 런치 오버헤드가 아니라 연산 자체가 포화다. 이미지 1464×895 를 정사각 패딩(1464²)하고 질의 35개를 매 이미지마다 인코딩하기 때문.",
-      "stage2_qwen_sec_per_call": [1.19, 1.21],
-      "_stage2_cond": "A100 80GB bf16, 패널 684×336, max_new_tokens 120, 중앙값 12회 × 2런",
-      "measured_on": "NVIDIA A100-SXM4-80GB",
-      "optimization_path": [
-        { "rank": 1, "방법": "프레임 프리필터 — 270장 전량이 아니라 값싼 색도·텍스처로 상위 K장만", "근거": "선형 절감. K=20 이면 7분→7초급", "⚠️": "재현율을 팔 위험. 반드시 같은 300장 평가셋에서 게이트 R 을 재측정하고 적용할 것" },
-        { "rank": 2, "방법": "질의 임베딩 캐시 — 질의 35개가 고정인데 매 이미지마다 재인코딩한다", "근거": "텍스트 인코더 호출 제거", "note": "재현율에 영향 없는 순수 최적화. 먼저 하는 게 맞다" },
-        { "rank": 3, "방법": "입력 해상도 축소 · FP16 · TensorRT", "근거": "통상 3~5배 (미측정)" }
-      ]
-    },
-
-    "rejected": [
-      { "시도": "VLM 심각도 등급", "결과": "결함 19.7% vs 무결함 20.2% 가 4등급↑", "판정": "분리력 0" },
-      { "시도": "VLM 유형 (크롭만, v8)", "결과": 0.157, "판정": "베이스라인 0.340 대비 −0.183" },
-      { "시도": "VLM 유형 (셀 전체+크롭, v9)", "결과": 0.115, "판정": "−0.225. 긁힘 답으로 69% 붕괴" },
-      { "시도": "검출기 태그 유형", "결과": "0.183 / 0.267", "판정": "베이스라인 이하" },
-      { "시도": "픽셀 색 규칙 유형", "결과": 0.457, "판정": "+0.081 (문턱 +0.10 미달)" },
-      { "시도": "top-2 / top-3", "결과": "0.619 / 0.748", "판정": "베이스라인 0.581 / 0.762 대비 +0.038 / −0.014" },
-      { "시도": "예산 모드 recall 0.738", "결과": "순열 1.38×", "판정": "폐기. 정상 프레임에도 N박스를 강제해 '정상에서 조용해지는가'를 측정 불가로 만든다" },
-      { "시도": "질의어 교체 recall 0.993", "결과": "순열 1.24×, 비대칭 6.4→4.4", "판정": "박스가 커진 것" },
-      { "시도": "셀 위/아래 밴드 필터", "결과": "N≥12 동일, N≥8 에서 놓침 0→1", "판정": "상방 없음" },
-      { "시도": "VLM 신뢰도 점수", "결과": "캘리브레이션 −0.477", "판정": "내보내지 않음" }
+    "정상:반사": [
+     "light reflection",
+     "specular highlight"
     ],
-    "_type_naming_unsolved": "유형 이름은 미해결이다. 네 갈래로 독립 확인했다 — VLM 크롭 · VLM 문맥 · 검출기 태그 · 픽셀 색 규칙. 남은 구조적 가설이 없다. 게이트에 주는 영향은 0 (게이트는 태그를 안 쓴다).",
-
-    "_why_not_supervised": {
-      "'무결함'이라던 셀 515·581": "오염 실재",
-      "표면이 가장 고른 셀 10개 전수 확인": "10개 전부 결함 = 정상 클래스 부재",
-      "conf≥0.10 검출의 라벨 미대응": "46.4%",
-      "GT 가 결함 전체가 아니라 조각": "면적비 p50 112배",
-      "모델 레버 7개 결과": "전부 0.12~0.22 수렴"
-    }
-  },
-
-  "fixtures": {
-    "count": 20,
-    "requested_count": "20~30",
-    "status": "✅ 2026-08-06 생성 · 회귀 검증 통과",
-    "path": "{OUT}/modelcard/golden_fixture.json",
-    "_commit": "git 커밋 대상",
-    "seed": 7,
-    "composition": "평가셋 300장에서 추출 (결함·무결함 혼합)",
-    "frozen_values": "프레임별 박스 목록 (bbox · score · tag) + 게이트 판정",
-    "tolerance": {
-      "게이트 판정 · 박스 개수": "완전 일치",
-      "score": "±2e-3",
-      "bbox": "±1 px",
-      "VLM 종류 · 크기": "완전 일치",
-      "VLM 본것 문장": "비교 대상에서 제외"
-    },
-    "_vlm_note": "do_sample=False 라 greedy 이므로 같은 버전·같은 GPU 에서는 재현되지만 토큰 단위 일치는 부동소수에 취약하다. 문장을 문자열 비교하면 픽스처가 매번 깨져 아무도 안 보게 된다.",
-    "_regeneration_note": "픽스처는 매 실행 재생성된다. 그래서 runtime 의 교차버전 동일성은 집계 지표까지만 검증됐다. 버전 간 박스 단위를 보려면 픽스처 파일을 버전별로 보관할 것."
-  },
-
-  "reproduce": {
-    "training": "없음 (사전학습 가중치 그대로)",
-    "notebooks": {
-      "battery_ext_modelcard_check.ipynb": "모델카드 검증 11셀 — revision · 환경 · 지연 · 운영점 · 픽스처",
-      "battery_ext_unsup.ipynb": "12셀 — §0 크롭본 / §1 OWLv2 / §4 Qwen 로드",
-      "battery_ext_evalset.ipynb": "30셀 — §A 표본 / §B 라벨링 / §C 채점 / §Y 리포트 JSON"
-    },
-    "sequences": {
-      "리포트 JSON 생성 (운영)": "unsup §1 → evalset §C → §M3 → §Y",
-      "게이트 성능 재현": "unsup §1 → evalset §C → §C-run",
-      "2단 VLM 덤프": "unsup §1 → unsup §4 → evalset §C → §E → §F",
-      "모델카드 재검증": "modelcard_check §0→§1→§3→§4→§5→§7→§8→(§6)→§2→§9"
-    },
-    "_warning": "unsup §4-run 은 돌리지 말 것 — 셀 리포트 전용이며 옛 프롬프트를 쓴다",
-    "artifacts": "{OUT}/modelcard/ — env.json · revisions.json · latency_owlv2.json · latency_qwen.json · operating_point.json · golden_fixture.json · modelcard_summary.md",
-    "OUT": "/content/drive/MyDrive/ext_evalset (kt_out 이 읽기 전용이면 자동 폴백)"
-  },
-
-  "prohibited": [
-    "외부 API 호출 금지 — 배터리 도메인 제약. 두 모델 다 로컬 GPU",
-    "매니페스트 라벨 사용 금지 — 맞는 게 거의 없다",
-    "유형 이름을 확정으로 리포트하지 말 것 — 검증 미통과",
-    "유형 신뢰도 점수를 외부로 내보내지 말 것 — 캘리브레이션 붕괴",
-    "정상:금속캡 을 DROP_TAGS 에 넣지 말 것 — 진짜 결함을 더 많이 잃는다",
-    "PIL.thumbnail() 쓰지 말 것 — 확대를 안 한다. resize",
-    "프롬프트에 예시·기준표·특징 목록을 넣지 말 것 — 그대로 복사된다",
-    "예산(장당 N박스) 모드로 평가하지 말 것 — 정상 프레임에도 N박스를 강제해 신호를 가린다",
-    "점 recall 을 IoU 기준 옛 수치와 나란히 놓지 말 것 — 다른 잣대다"
-  ],
-
-  "known_gaps": [
-    { "id": 1, "항목": "6유형 → 계약 enum 매핑 (CORROSION·PEELING 추가?)", "주체": "팀+계약", "심각도": "높음", "비고": "코드로 해결 불가" },
-    { "id": 2, "항목": "배포 지연 대책 결정", "주체": "팀", "심각도": "높음", "비고": "프리필터 채택 여부 + 채택 시 R 재측정" },
-    { "id": 3, "항목": "셀 판정 규칙 — PASS/REJECT vs 프레임 집계", "주체": "팀+계약", "심각도": "높음", "비고": "무결함 셀이 없어 셀 단위가 성립 안 함" },
-    { "id": 4, "항목": "배포 GPU 사양", "주체": "인프라", "심각도": "높음", "비고": "Qwen 7B bf16 ~16GB + OWLv2 수용? 측정은 A100 80GB" },
-    { "id": 5, "항목": "크롭을 ai-infer 가 하는가, 크롭본을 받는가", "주체": "팀", "심각도": "보통", "비고": "좌표 원복 책임 소재" },
-    { "id": 6, "항목": "source_commit", "주체": "우리", "심각도": "보통", "비고": "커밋 후 기입" },
-    { "id": 7, "항목": "ext_requirements.lock.txt 를 레포에 커밋", "주체": "우리", "심각도": "보통", "비고": "값은 확보 · 파일만 없음" },
-    { "id": 8, "항목": "유형별 검출률 300장 재집계", "주체": "우리", "심각도": "보통", "비고": "현재 표가 1차 150장 기준" },
-    { "id": 9, "항목": "YOLO 대조군의 iou·max_det·half·SAHI postprocess", "주체": "우리", "심각도": "낮음", "비고": "control_track_yolo" }
-  ],
-  "_closed_this_round": [
-    "HF revision 고정 (로컬 = 원격 확인)",
-    "라이브러리 버전 실측 + transformers 안정 범위 확인",
-    "1단 지연 실측 (배치별)",
-    "2단 지연 실측",
-    "골든 픽스처 20장 생성 · 회귀 통과",
-    "운영점 300장 재현",
-    "topk 확정 (50)",
-    "출력 스키마 확정 (report_json)",
-    "VLM 정상 판별력 측정 — 분리력 0 으로 확인, 그래서 등급을 안 내보냄"
-  ],
-
-  "control_track_yolo": {
-    "_status": "보존 — 지우지 않는다. 같은 시험지의 대조군이고 계약이 YOLO 를 전제하고 있어 되돌아갈 수도 있다",
-    "weight_file": "train_ext_crop_v5_idcap/best.pt",
-    "architecture": "yolo11m (detection)",
-    "classes": { "0": "Damaged", "1": "Pollution" },
-    "imgsz": 1280,
-    "structure": "클래스별 2패스 — 모델 하나, 추론 두 번",
-    "passes": [
-      { "class": "Pollution", "mode": "plain", "imgsz": 1280, "conf": 0.30, "근거": "conf 0.10~0.30 구간이 평탄해 성능 손실 0 으로 출력만 7.32→3.06개" },
-      { "class": "Damaged", "mode": "sahi", "slice": 640, "overlap": 0.2, "conf": 0.02, "근거": "recall 우선. 정밀도는 후단이 담당" }
+    "정상:금속캡": [
+     "metal cap",
+     "battery terminal"
     ],
-    "point_recall": 0.089,
-    "point_recall_thr": 0.05,
-    "point_recall_ratio": 2.07,
-    "warnings": [
-      "EXT 전체를 SAHI 로 돌리지 말 것 — plain 이 이미 R=1.0 이고 SAHI 는 오탐만 늘린다. Damaged 에만 켠다",
-      "conf 0.30/0.02 와 image-level F1 0.98 은 v3.4 계열(train_ext_v34) 기준이고, 점 recall 0.089 는 crop_v5_idcap 기준이다. 다른 가중치·다른 시험지라 섞어 읽으면 안 된다",
-      "F1 0.98 은 Pollution 이 캐리한 평균값이다 (클래스별 0.997 / 0.457)",
-      "iou·max_det·half·SAHI postprocess 미기록. conf 0.02 는 sahi 자동전환 구간이라 CT 에서 발견한 함정이 그대로 적용된다"
+    "정상:테두리": [
+     "bottom edge of cylinder",
+     "rim of metal can",
+     "silhouette edge"
     ]
+   },
+   "drop_tags": [
+    "정상:인쇄·각인",
+    "정상:반사",
+    "정상:테두리"
+   ],
+   "_keep_metal_cap": "정상:금속캡 은 이름만 붙이고 버리지 않는다. 구조물 판정으로 지우면 오탐 5개 지우고 진짜 결함 9개를 잃는다(순손실). 캡 위의 부식은 결함이다. DROP_TAGS 에 추가하지 말 것.",
+   "_query_swap_lesson": "녹 질의를 금속 지향 → 색·산화 지향으로 바꾸니 녹 태그 정확도 0.031 → 0.225 (순열 2.46×), 재학습 0회. 그런데 게이트·검출률은 소수점까지 동일했다. 질의어는 '찾기'가 아니라 '이름'만 바꾼다."
+  },
+  "stage1_gate_cell": {
+   "role": "셀 단위 폐기 판정 — 계약 REJECT/PASS 에 대응",
+   "rule": "셀당 30프레임 균등 추출 → 각 프레임을 stage1_gate 로 판정 → flag율 ≥ 0.70 이면 셀 = 결함",
+   "sample_k": 30,
+   "flag_rate_threshold": 0.7,
+   "precision": 1.0,
+   "recall": 1.0,
+   "eval_n_defect_cells": 12,
+   "eval_n_normal_cells": 12,
+   "_separation": "결함 확정 셀 flag율 최소 80% · 중앙 100% / 정상 추정 셀 최대 50% · 중앙 30% → 간격 +30%p",
+   "_why_not_or": "\"1장이라도 flag면 결함\"(OR)으로 하면 정상 셀도 30%씩 걸리므로 전부 결함이 된다. 프레임 오탐은 무작위이고 결함은 지속적이라, 프레임을 모으면 잡음이 평균으로 씻긴다. 그래서 셀 단위 P 가 0.855 → 1.000 으로 오른다.",
+   "_k_tradeoff": [
+    {
+     "K": 10,
+     "sec_per_cell": 4.1,
+     "cell_recall": 0.993,
+     "cell_precision": 0.975
+    },
+    {
+     "K": 20,
+     "sec_per_cell": 8.1,
+     "cell_recall": 0.998,
+     "cell_precision": 0.998
+    },
+    {
+     "K": 30,
+     "sec_per_cell": 12.2,
+     "cell_recall": 1.0,
+     "cell_precision": 1.0,
+     "채택": true
+    }
+   ],
+   "_caveat": "표본이 셀 12개씩이라 1.000 은 95% 상한 오차율 ~22% 로 근거가 얇다. 견고한 발견은 \"간격 +30%p\" 다. 정상 쪽은 \"무결함 프레임만 라벨된 셀\" 이라 셀 전체가 정상이란 보장이 없다 (결함 쪽은 라벨 확정이라 recall 은 신뢰 가능)."
   }
+ },
+ "deployment": {
+  "artifact": "ext_infer.py",
+  "_why_single_file": "노트북은 평가·실험용이다. 평가 노트북 32셀 중 배포 경로는 6개뿐이었다.",
+  "api": {
+   "ExtInspector.load()": "모델 1회 로드(지연). 이후 재사용",
+   "ExtInspector.infer_cell(cell_id, images, names=None)": "셀 판정 + 프레임별 결과 — 권장 진입점",
+   "ExtInspector.infer_frames(images, names=None)": "프레임별만",
+   "Config": "모든 상수 (frozen dataclass)",
+   "CONTRACT": "리포트 LLM 계약서 (필드별 신뢰 등급)",
+   "DEPLOY_NOTES": "배포 주의사항 원문"
+  },
+  "cli": [
+   "python ext_infer.py --cell 0041 --glob \"frames/0041_*.jpg\" --out result.json",
+   "python ext_infer.py --notes",
+   "python ext_infer.py --selftest"
+  ],
+  "disk_io": "없음 — 추론 경로에 파일 쓰기 0건 (--out 만 명시적)",
+  "memory": "배치 스트리밍. 셀 270장을 한 번에 올리면 약 1.6GB 라 cfg.batch(16)장씩만 상주",
+  "vlm_default": "use_vlm=False — 2단은 판정에 안 쓰이고 유형·등급이 검증 실패했다. 켜면 프레임당 +1.2초 × 결함 후보 수",
+  "latency": {
+   "per_frame_ms": {
+    "decode_crop_cpu": 29,
+    "detect_gpu": 353,
+    "total": 406
+   },
+   "_gpu_share": "92.4% — CPU 최적화는 의미가 없다",
+   "per_cell_sec": {
+    "전량_272프레임": 110.4,
+    "30프레임_채택": 12.2,
+    "20프레임": 8.1,
+    "10프레임": 4.1
+   },
+   "target_sec": 4.0,
+   "_status": "전량 27배 → 30프레임 3배. 판정 규칙을 바꾼 것만으로 줄였다(프리필터·FP16 미사용)",
+   "remaining": [
+    {
+     "방법": "질의 임베딩 캐시",
+     "기대": "×0.7 → 8.5초",
+     "재현율_영향": "없음 (순수 최적화). 먼저 할 것"
+    },
+    {
+     "방법": "FP16 · TensorRT",
+     "기대": "×0.25 통상",
+     "재현율_영향": "없음 (수치 검증 필요)"
+    },
+    {
+     "방법": "K 30 → 10",
+     "기대": "4.1초",
+     "재현율_영향": "셀 recall 1.000 → 0.993 (제품 결정)"
+    }
+   ]
+  },
+  "checklist": [
+   {
+    "항목": "ext_infer.py --selftest",
+    "상태": "OK"
+   },
+   {
+    "항목": "배포 경로 성능 실측",
+    "상태": "OK"
+   },
+   {
+    "항목": "모델 revision 고정",
+    "상태": "OK"
+   },
+   {
+    "항목": "라이브러리 버전 고정",
+    "상태": "OK"
+   },
+   {
+    "항목": "출력 좌표계 = 원본",
+    "상태": "OK"
+   },
+   {
+    "항목": "골든 픽스처 회귀",
+    "상태": "OK"
+   },
+   {
+    "항목": "입력 재인코딩 금지 합의",
+    "상태": "백엔드 확인 필요"
+   },
+   {
+    "항목": "지연 목표 (12.2초 vs 4초)",
+    "상태": "미달"
+   },
+   {
+    "항목": "계약 enum 확장",
+    "상태": "팀 협의"
+   }
+  ]
+ },
+ "output": {
+  "detector_tuple": "(x1, y1, x2, y2, score, tag, query)",
+  "bbox_format": "xyxy",
+  "coordinate_reference": "original_image",
+  "_coordinate_note": "bbox 는 **입력 원본 좌표**다. 내부에서 셀을 크롭하고 그 오프셋을 더해 돌려준다. bbox_크롭 · 크롭_오프셋 을 같이 내보내므로 백엔드가 역산 검증할 수 있다. ext_infer.py --selftest 가 왕복 변환을 20회 검증한다.",
+  "_score_warning": "score 는 질의마다 스케일이 다르다. 전역 argmax 를 하므로 tag 는 '가장 잘 맞는 결함'이 아니라 '가장 점수가 잘 나오는 질의'다. 게이트는 개수만 세므로 무관하지만 tag 를 유형으로 신뢰하면 안 된다.",
+  "defect_types": [
+   "녹·부식",
+   "벗겨짐·박리",
+   "파손·찢김",
+   "긁힘·스크래치",
+   "들뜸",
+   "오염·이물질"
+  ],
+  "class_map": null,
+  "_class_map_gap": "계약 §6.5 RGB enum 은 CRACK·SPOT 2종인데 이 파이프라인은 6종이다. 파손·찢김→CRACK, 오염·이물질→SPOT 까지는 자연스럽지만 녹·부식(사람 점 최다)·긁힘·스크래치·벗겨짐·박리·들뜸 이 갈 곳이 없다. 선택지는 ①6종을 2종으로 뭉갠다(정보 손실) ②계약 enum 에 CORROSION·PEELING 을 추가한다. 계약 쪽 결정 필요 (known_gaps #1).",
+  "_class_map_scope": "판정(게이트)은 이 결정과 무관하게 이미 동작한다. 게이트는 태그를 안 쓴다. 막히는 건 리포트의 유형 표기뿐이다.",
+  "report_json": {
+   "_premise": "리포트를 쓰는 것은 LLM 이고 이미지를 볼 수 없다. 우리가 틀린 값을 넘기면 LLM 은 그대로 사실로 받아 적는다. 값만 넘기지 않고 그 값이 어디까지 검증됐는지를 같이 넘긴다.",
+   "layout": {
+    "_contract.json": "LLM 프롬프트 맨 앞에 붙일 계약서 (1개). 없이 주면 LLM 이 유형후보 1등을 확정으로 써버린다",
+    "cell_XXXX.json": "셀당 1개"
+   },
+   "path": "{OUT}/report_input/",
+   "fields": {
+    "셀": {
+     "type": "str",
+     "값": "파일명 cylindrical_(\\d+)_ 에서 추출",
+     "신뢰": null
+    },
+    "검사_프레임수": {
+     "type": "int",
+     "신뢰": null
+    },
+    "프레임[].파일": {
+     "type": "str",
+     "신뢰": null
+    },
+    "프레임[].판정": {
+     "type": "str",
+     "값": [
+      "결함",
+      "정상"
+     ],
+     "신뢰": "높음",
+     "근거": "300장 F1 0.930"
+    },
+    "프레임[].판정_근거": {
+     "type": "obj",
+     "값": "{임계: 0.08, 박스수: int, 기준: '8개 이상'}",
+     "신뢰": null
+    },
+    "결함[].위치.구역": {
+     "type": "str",
+     "값": [
+      "금속캡",
+      "몸통"
+     ],
+     "신뢰": "높음"
+    },
+    "결함[].위치.셀_상단에서": {
+     "type": "float",
+     "값": "0.0~1.0",
+     "신뢰": "높음"
+    },
+    "결함[].위치.bbox": {
+     "type": "int[4]",
+     "값": "[x1,y1,x2,y2] 원본 픽셀",
+     "신뢰": "높음"
+    },
+    "결함[].크기.셀면적비_퍼센트": {
+     "type": "float",
+     "값": "박스면적/셀면적×100",
+     "신뢰": "중간"
+    },
+    "결함[].크기.구분": {
+     "type": "str",
+     "값": [
+      "큼(≥1.0%)",
+      "작음"
+     ],
+     "신뢰": "중간"
+    },
+    "결함[].유형후보": {
+     "type": "str[]",
+     "값": "순위 있는 이름 목록. 점수 없음",
+     "신뢰": "낮음"
+    },
+    "결함[].유형_주의": {
+     "type": "str",
+     "값": "검증 미통과. 확정 표현 금지",
+     "신뢰": null
+    }
+   },
+   "defect_array_rule": "판정 == '결함' 일 때만 채워지고, 프레임당 최대 6개 (점수 상위)",
+   "_no_type_score": "초기 버전은 유형후보에 점수를 함께 냈다(['긁힘·스크래치', 0.84]). 폐기했다 — 0.85~1.01 구간이 176/210(84%)이고 평균 점수 0.954 인데 실제 적중은 0.477 이었다(−0.477). LLM 은 그림을 못 보므로 그 숫자를 '확실히 녹입니다'로 옮긴다 = 없는 확신을 만들어 파는 것. 순위만 넘긴다."
+  },
+  "grade": {
+   "computed_by": "code",
+   "formula": "0 if kind == 0 else min(5, SIZE_G[size] + (1 if kind in {2,3} else 0))",
+   "size_map": {
+    "A": 4,
+    "B": 3,
+    "C": 2,
+    "D": 1
+   },
+   "kind_up": [
+    2,
+    3
+   ],
+   "_kind_up_why": "벗겨짐·파손은 금속 노출로 이어진다",
+   "_why_code_not_vlm": "등급은 '얼마나 심한가'라는 주관 판단이라 모델이 가장 쉽게 뭉갠다(실제로 뭉갰다). 크기·종류는 눈에 보이는 사실이라 훨씬 안정적이고, 이 규칙은 모델 카드에 그대로 적을 수 있으며 같은 입력이면 같은 등급이 나온다.",
+   "exported": false,
+   "_why_not_exported": "결함 프레임 박스의 19.7% 가 4등급↑ 인데 무결함 프레임은 20.2% 로 분리력이 0 이다. report_json 스키마에 등급 필드가 없는 이유."
+  },
+  "verdict_rule": null,
+  "_verdict_gap": "셀 단위 PASS/REJECT 가 성립하지 않는다. 표면이 가장 고른 셀 10개를 육안 확인했더니 10개 전부 결함이었고, 매니페스트가 '무결함'이라 표시한 셀 2개(515·581)도 둘 다 오염이 실재했다. 이 데이터에 무결함 셀이 사실상 없어 계약 §12.1 의 셀 단위 판정은 분모가 없다. 프레임 단위로는 사람이 검증한 무결함 99장이 있어 게이트 P/R 은 잴 수 있다. 계약 쪽 논의 필요 (known_gaps #3)."
+ },
+ "confidence_formula": {
+  "_answers_request": "요청서 §7 — 계약 §12.1 최상위 confidence 산식",
+  "scalar": "s8 = 8번째로 높은 박스 점수",
+  "_why": "게이트는 '점수 ≥ 0.08 인 박스가 8개 이상'이고, 이 조건은 s8 ≥ 0.08 과 동치다. 판정을 뒤집는 유일한 값이 s8 이라 CT 의 '검출 confidence' 에 정확히 대응한다.",
+  "REJECT": "s8 (≥ 0.08)",
+  "PASS_with_candidates": "1 − s8 (s8 < 0.08)",
+  "PASS_no_candidates": "1.0 — 박스가 8개 미만이면 s8 = 0 이라 자동으로 1.0",
+  "extra_cost": "없음",
+  "_why_free": "topk 50 으로 넓게 수집한 뒤 점수 임계로 사후 필터하는 구조라 s8 은 이미 계산된 값 중 8번째를 읽는 것이다. 재추론이 필요 없다. 슬라이스 병합(NMS/NMM)이 없어 저점수 박스가 고점수 박스의 생존에 영향을 줄 수 없다 — CT 가 겪은 문제 자체가 없다.",
+  "caveats": [
+   "topk 가 8 이상이어야 한다. 현재 50 이라 여유롭지만 낮추면 s8 자체가 안 나온다",
+   "위는 파이프라인 구조에서 나온 추론이지 별도 실측이 아니다. 검증은 싸다 — detect() 를 thr=0.0 으로 돌려 s8 을 뽑고, s8 ≥ 0.08 판정이 골든 픽스처의 게이트 판정 20건과 전부 일치하는지 보면 확정이다"
+  ]
+ },
+ "performance": {
+  "eval_set": {
+   "images": 300,
+   "points": 684,
+   "clean_frames": 99,
+   "composition": "1차 150장(seed 42) + 2차 150장(seed 2026, 1차와 겹침 0)",
+   "sampling": "셀당 최대 2장 층화, split=val 고정",
+   "_why_2_per_cell": "한 셀의 270프레임은 서로 닮아 상관 표본이 된다(유효 표본 수가 준다)",
+   "labeler": "사람(사용자) 클릭 — 결함 중심에 점 하나",
+   "_caveat": "정답을 찍은 사람과 성능을 판단하는 사람이 같다. 팀 교차 라벨링으로 보강 예정"
+  },
+  "metric": "점 recall — 예측 박스 안에 사람 점이 들어가면 적중",
+  "_why_point_not_iou": "기존 GT 는 결함 전체가 아니라 파편이라, 결함을 정확히 잡을수록 면적이 커져 IoU 가 떨어진다. 점은 조각이 될 수 없고 크기 논쟁도 없다. IoU 를 쓰지 않는다.",
+  "control": {
+   "method": "순열 — 이미지 이름을 섞어 남의 이미지 박스로 채점한다. 박스를 많이(또는 크게) 뿌리면 우연히 맞기 때문",
+   "rules": {
+    "recall·정확도": "배율 ≥ 2",
+    "F1 스윕": "순열 p < 0.01 & F1 > p95 (순열 바닥이 기저율 ~0.5 이라 배율 상한이 2.0)",
+    "다중클래스 정확도": "최빈 유형 베이스라인 대비"
+   },
+   "_most_expensive_lesson": "순열 대조를 통과해도 '가장 흔한 유형 찍기'보다 못할 수 있다. 실측: 검출기 태그 0.267 < 무조건-녹 0.376.",
+   "preregistration": "지표와 폐기 규칙을 예측을 보기 전에 고정한다. 실제로 recall 0.738(순열 1.38×)과 recall 0.993(순열 1.24×)을 이 규칙으로 폐기했다."
+  },
+  "operating_points": [
+   {
+    "설정": "thr0.05 N≥40",
+    "P": 0.97,
+    "R": 0.98,
+    "F1": 0.975,
+    "오탐": 6,
+    "놓침": 4,
+    "note": "F1 최대"
+   },
+   {
+    "설정": "thr0.12 N≥8",
+    "P": 0.965,
+    "R": 0.96,
+    "F1": 0.963,
+    "오탐": 7,
+    "놓침": 8
+   },
+   {
+    "설정": "thr0.10 N≥8",
+    "P": 0.855,
+    "R": 1.0,
+    "F1": 0.922,
+    "오탐": 34,
+    "놓침": 0,
+    "채택": true
+   },
+   {
+    "설정": "thr0.08 N≥12",
+    "P": 0.804,
+    "R": 1.0,
+    "F1": 0.891,
+    "오탐": 49,
+    "놓침": 0
+   }
+  ],
+  "_operating_point_rationale": "F1 최대점(0.970)이 아니라 놓침이 최소인 지점을 택했다. 불량 게이트에서 놓침 7장(결함 셀 7개 통과)은 오탐 29장(사람이 29장 더 봄)과 비교 대상이 아니다.",
+  "robustness": {
+   "150장_0805": {
+    "P": 0.876,
+    "R": 1.0,
+    "F1": 0.934
+   },
+   "300장_0806": {
+    "P": 0.873,
+    "R": 0.995,
+    "F1": 0.93
+   },
+   "note": "표본이 2배가 됐는데 F1 이 0.004 밖에 안 움직였다 = 운영점이 견고하다. 다만 recall 이 1.000 → 0.995(놓침 1건)로 내려갔으므로 150장 숫자를 계속 쓰지 않는다."
+  },
+  "by_type": {
+   "_basis": "이 표의 사람 점 합이 299 라 1차 150장(점 302) 기준이다. 300장 재집계는 안 했다 (known_gaps #8). 게이트·점 recall 수치는 300장 기준이 맞다.",
+   "_meaning": "'찾았는가'이지 '이름을 맞혔는가'가 아니다",
+   "녹·부식": {
+    "points": 82,
+    "owlv2": 0.89,
+    "yolo": 0.024
+   },
+   "긁힘·스크래치": {
+    "points": 30,
+    "owlv2": 0.867,
+    "yolo": 0.0
+   },
+   "들뜸": {
+    "points": 15,
+    "owlv2": 0.6,
+    "yolo": 0.0
+   },
+   "벗겨짐·박리": {
+    "points": 73,
+    "owlv2": 0.767,
+    "yolo": 0.137
+   },
+   "오염·이물질": {
+    "points": 99,
+    "owlv2": 0.808,
+    "yolo": 0.141
+   }
+  },
+  "normal_separation": {
+   "결함_박스당장": 13.0,
+   "무결함_박스당장": 2.1,
+   "비대칭": 6.3,
+   "thr": 0.12,
+   "note": "이 프로젝트 최초의 정상/결함 분리 증거"
+  },
+  "vlm_size_correlation": {
+   "rho": 0.297,
+   "permutation_runs": 1000,
+   "p": 0.001
+  },
+  "latency": {
+   "_status": "🔴 배포 요구를 크게 초과한다",
+   "target_per_cell_sec": 4,
+   "frames_per_cell": 270,
+   "stage1_owlv2": [
+    {
+     "batch": 1,
+     "ms_per_image": [
+      380,
+      377
+     ],
+     "min_per_cell": [
+      1.71,
+      1.7
+     ]
+    },
+    {
+     "batch": 4,
+     "ms_per_image": [
+      355,
+      346
+     ],
+     "min_per_cell": [
+      1.6,
+      1.56
+     ]
+    },
+    {
+     "batch": 8,
+     "ms_per_image": [
+      357,
+      343
+     ],
+     "min_per_cell": [
+      1.61,
+      1.54
+     ]
+    },
+    {
+     "batch": 16,
+     "ms_per_image": [
+      353,
+      341
+     ],
+     "min_per_cell": [
+      1.59,
+      1.53
+     ],
+     "채택": true
+    }
+   ],
+   "stage1_verdict": "셀당 1.53~1.59분 = 목표 4초 대비 약 23배. 전량 추론은 불가.",
+   "_saturated": "배치를 16배 키워도 7% 밖에 안 빨라진다 = 런치 오버헤드가 아니라 연산 자체가 포화다. 이미지 1464×895 를 정사각 패딩(1464²)하고 질의 35개를 매 이미지마다 인코딩하기 때문.",
+   "stage2_qwen_sec_per_call": [
+    1.19,
+    1.21
+   ],
+   "_stage2_cond": "A100 80GB bf16, 패널 684×336, max_new_tokens 120, 중앙값 12회 × 2런",
+   "measured_on": "NVIDIA A100-SXM4-80GB",
+   "optimization_path": [
+    {
+     "rank": 1,
+     "방법": "프레임 프리필터 — 270장 전량이 아니라 값싼 색도·텍스처로 상위 K장만",
+     "근거": "선형 절감. K=20 이면 7분→7초급",
+     "⚠️": "재현율을 팔 위험. 반드시 같은 300장 평가셋에서 게이트 R 을 재측정하고 적용할 것"
+    },
+    {
+     "rank": 2,
+     "방법": "질의 임베딩 캐시 — 질의 35개가 고정인데 매 이미지마다 재인코딩한다",
+     "근거": "텍스트 인코더 호출 제거",
+     "note": "재현율에 영향 없는 순수 최적화. 먼저 하는 게 맞다"
+    },
+    {
+     "rank": 3,
+     "방법": "입력 해상도 축소 · FP16 · TensorRT",
+     "근거": "통상 3~5배 (미측정)"
+    }
+   ]
+  },
+  "rejected": [
+   {
+    "시도": "VLM 심각도 등급",
+    "결과": "결함 19.7% vs 무결함 20.2% 가 4등급↑",
+    "판정": "분리력 0"
+   },
+   {
+    "시도": "VLM 유형 (크롭만, v8)",
+    "결과": 0.157,
+    "판정": "베이스라인 0.340 대비 −0.183"
+   },
+   {
+    "시도": "VLM 유형 (셀 전체+크롭, v9)",
+    "결과": 0.115,
+    "판정": "−0.225. 긁힘 답으로 69% 붕괴"
+   },
+   {
+    "시도": "검출기 태그 유형",
+    "결과": "0.183 / 0.267",
+    "판정": "베이스라인 이하"
+   },
+   {
+    "시도": "픽셀 색 규칙 유형",
+    "결과": 0.457,
+    "판정": "+0.081 (문턱 +0.10 미달)"
+   },
+   {
+    "시도": "top-2 / top-3",
+    "결과": "0.619 / 0.748",
+    "판정": "베이스라인 0.581 / 0.762 대비 +0.038 / −0.014"
+   },
+   {
+    "시도": "예산 모드 recall 0.738",
+    "결과": "순열 1.38×",
+    "판정": "폐기. 정상 프레임에도 N박스를 강제해 '정상에서 조용해지는가'를 측정 불가로 만든다"
+   },
+   {
+    "시도": "질의어 교체 recall 0.993",
+    "결과": "순열 1.24×, 비대칭 6.4→4.4",
+    "판정": "박스가 커진 것"
+   },
+   {
+    "시도": "셀 위/아래 밴드 필터",
+    "결과": "N≥12 동일, N≥8 에서 놓침 0→1",
+    "판정": "상방 없음"
+   },
+   {
+    "시도": "VLM 신뢰도 점수",
+    "결과": "캘리브레이션 −0.477",
+    "판정": "내보내지 않음"
+   }
+  ],
+  "_type_naming_unsolved": "유형 이름은 미해결이다. 네 갈래로 독립 확인했다 — VLM 크롭 · VLM 문맥 · 검출기 태그 · 픽셀 색 규칙. 남은 구조적 가설이 없다. 게이트에 주는 영향은 0 (게이트는 태그를 안 쓴다).",
+  "_why_not_supervised": {
+   "'무결함'이라던 셀 515·581": "오염 실재",
+   "표면이 가장 고른 셀 10개 전수 확인": "10개 전부 결함 = 정상 클래스 부재",
+   "conf≥0.10 검출의 라벨 미대응": "46.4%",
+   "GT 가 결함 전체가 아니라 조각": "면적비 p50 112배",
+   "모델 레버 7개 결과": "전부 0.12~0.22 수렴"
+  },
+  "_operating_points_path": "배포 경로(원본 → 크롭 → 검출) · 프레임 300장",
+  "path_comparison": [
+   {
+    "경로": "평가(노트북)",
+    "입력": "이미 잘린 크롭 · JPEG 2세대",
+    "thr": 0.08,
+    "P": 0.873,
+    "R": 0.995,
+    "F1": 0.93,
+    "오탐": 29,
+    "놓침": 1
+   },
+   {
+    "경로": "배포 입력에 평가 임계 그대로",
+    "입력": "원본→크롭 · 1세대",
+    "thr": 0.08,
+    "P": 0.739,
+    "R": 1.0,
+    "F1": 0.85,
+    "오탐": 71,
+    "놓침": 0
+   },
+   {
+    "경로": "배포(확정)",
+    "입력": "원본→크롭 · 1세대",
+    "thr": 0.1,
+    "P": 0.855,
+    "R": 1.0,
+    "F1": 0.922,
+    "오탐": 34,
+    "놓침": 0
+   }
+  ],
+  "cell_level": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "defect_cells": 12,
+   "normal_cells": 12,
+   "rule": "30프레임 중 flag율 ≥ 70%",
+   "_see": "inference.stage1_gate_cell"
+  }
+ },
+ "fixtures": {
+  "count": 20,
+  "requested_count": "20~30",
+  "status": "✅ 2026-08-06 생성 · 회귀 검증 통과",
+  "path": "{OUT}/modelcard/golden_fixture.json",
+  "_commit": "git 커밋 대상",
+  "seed": 7,
+  "composition": "평가셋 300장에서 추출 (결함·무결함 혼합)",
+  "frozen_values": "프레임별 박스 목록 (bbox · score · tag) + 게이트 판정",
+  "tolerance": {
+   "게이트 판정 · 박스 개수": "완전 일치",
+   "score": "±2e-3",
+   "bbox": "±1 px",
+   "VLM 종류 · 크기": "완전 일치",
+   "VLM 본것 문장": "비교 대상에서 제외"
+  },
+  "_vlm_note": "do_sample=False 라 greedy 이므로 같은 버전·같은 GPU 에서는 재현되지만 토큰 단위 일치는 부동소수에 취약하다. 문장을 문자열 비교하면 픽스처가 매번 깨져 아무도 안 보게 된다.",
+  "_regeneration_note": "픽스처는 매 실행 재생성된다. 그래서 runtime 의 교차버전 동일성은 집계 지표까지만 검증됐다. 버전 간 박스 단위를 보려면 픽스처 파일을 버전별로 보관할 것."
+ },
+ "reproduce": {
+  "training": "없음 (사전학습 가중치 그대로)",
+  "notebooks": {
+   "battery_ext_modelcard_check.ipynb": "모델카드 검증 11셀 — revision · 환경 · 지연 · 운영점 · 픽스처",
+   "battery_ext_unsup.ipynb": "12셀 — §0 크롭본 / §1 OWLv2 / §4 Qwen 로드",
+   "battery_ext_evalset.ipynb": "30셀 — §A 표본 / §B 라벨링 / §C 채점 / §Y 리포트 JSON"
+  },
+  "sequences": {
+   "리포트 JSON 생성 (운영)": "unsup §1 → evalset §C → §M3 → §Y",
+   "게이트 성능 재현": "unsup §1 → evalset §C → §C-run",
+   "2단 VLM 덤프": "unsup §1 → unsup §4 → evalset §C → §E → §F",
+   "모델카드 재검증": "modelcard_check §0→§1→§3→§4→§5→§7→§8→(§6)→§2→§9"
+  },
+  "_warning": "unsup §4-run 은 돌리지 말 것 — 셀 리포트 전용이며 옛 프롬프트를 쓴다",
+  "artifacts": "{OUT}/modelcard/ — env.json · revisions.json · latency_owlv2.json · latency_qwen.json · operating_point.json · golden_fixture.json · modelcard_summary.md",
+  "OUT": "/content/drive/MyDrive/ext_evalset (kt_out 이 읽기 전용이면 자동 폴백)"
+ },
+ "prohibited": [
+  "외부 API 호출 금지 — 배터리 도메인 제약. 두 모델 다 로컬 GPU",
+  "매니페스트 라벨 사용 금지 — 맞는 게 거의 없다",
+  "유형 이름을 확정으로 리포트하지 말 것 — 검증 미통과",
+  "유형 신뢰도 점수를 외부로 내보내지 말 것 — 캘리브레이션 붕괴",
+  "정상:금속캡 을 DROP_TAGS 에 넣지 말 것 — 진짜 결함을 더 많이 잃는다",
+  "PIL.thumbnail() 쓰지 말 것 — 확대를 안 한다. resize",
+  "프롬프트에 예시·기준표·특징 목록을 넣지 말 것 — 그대로 복사된다",
+  "예산(장당 N박스) 모드로 평가하지 말 것 — 정상 프레임에도 N박스를 강제해 신호를 가린다",
+  "점 recall 을 IoU 기준 옛 수치와 나란히 놓지 말 것 — 다른 잣대다"
+ ],
+ "known_gaps": [
+  {
+   "id": 1,
+   "항목": "6유형 → 계약 enum 매핑 (CORROSION·PEELING 추가?)",
+   "주체": "팀+계약",
+   "심각도": "높음",
+   "비고": "코드로 해결 불가"
+  },
+  {
+   "id": 2,
+   "항목": "배포 지연 — 12.2초 vs 목표 4초 (3배)",
+   "주체": "팀",
+   "심각도": "보통",
+   "비고": "전량 27배에서 셀 서브샘플링으로 3배까지 내렸다. 질의 임베딩 캐시(손실 0) → 8.5초. K=10 이면 4.1초지만 셀 recall 0.993"
+  },
+  {
+   "id": 3,
+   "항목": "셀 판정 규칙 — 셀 단위 정답 라벨로 재확인",
+   "주체": "팀+계약",
+   "심각도": "보통",
+   "비고": "flag율 ≥ 70% 규칙이 성립함을 확인(결함 12셀 vs 정상 12셀, 간격 +30%p). 다만 정상 쪽이 추정이라 셀 라벨로 재확인 필요"
+  },
+  {
+   "id": 4,
+   "항목": "배포 GPU 사양",
+   "주체": "인프라",
+   "심각도": "높음",
+   "비고": "Qwen 7B bf16 ~16GB + OWLv2 수용? 측정은 A100 80GB"
+  },
+  {
+   "id": 5,
+   "항목": "크롭 주체 — 해소됨",
+   "주체": "팀",
+   "심각도": "낮음",
+   "비고": "ext_infer 가 원본을 받아 내부에서 크롭하고 원본 좌표로 돌려준다. ai-infer 는 원본만 넘기면 된다"
+  },
+  {
+   "id": 6,
+   "항목": "source_commit",
+   "주체": "우리",
+   "심각도": "보통",
+   "비고": "커밋 후 기입"
+  },
+  {
+   "id": 7,
+   "항목": "ext_requirements.lock.txt 를 레포에 커밋",
+   "주체": "우리",
+   "심각도": "보통",
+   "비고": "값은 확보 · 파일만 없음"
+  },
+  {
+   "id": 8,
+   "항목": "유형별 검출률 300장 재집계",
+   "주체": "우리",
+   "심각도": "보통",
+   "비고": "현재 표가 1차 150장 기준"
+  },
+  {
+   "id": 9,
+   "항목": "YOLO 대조군의 iou·max_det·half·SAHI postprocess",
+   "주체": "우리",
+   "심각도": "낮음",
+   "비고": "control_track_yolo"
+  },
+  {
+   "id": 10,
+   "항목": "입력 JPEG 재인코딩 금지 합의",
+   "주체": "백엔드",
+   "심각도": "높음",
+   "비고": "input._JPEG_GENERATION_CONTRACT. 지키지 않으면 운영점이 조용히 깨진다"
+  }
+ ],
+ "_closed_this_round": [
+  "HF revision 고정 (로컬 = 원격 확인)",
+  "라이브러리 버전 실측 + transformers 안정 범위 확인",
+  "1단 지연 실측 (배치별)",
+  "2단 지연 실측",
+  "골든 픽스처 20장 생성 · 회귀 통과",
+  "운영점 300장 재현",
+  "topk 확정 (50)",
+  "출력 스키마 확정 (report_json)",
+  "VLM 정상 판별력 측정 — 분리력 0 으로 확인, 그래서 등급을 안 내보냄",
+  "배포 모듈 ext_infer.py 신설 — 입력 원본 · 출력 원본좌표 · 디스크 쓰기 0 · 배치 스트리밍",
+  "JPEG 압축 세대가 검출 수를 53% 바꾼다는 실측 → 게이트 임계 0.08 → 0.10 재교정",
+  "셀 단위 판정 성립 — flag율 ≥ 70%, P/R 1.000 (이전 판에서는 \"성립 안 함\" 이었다)",
+  "지연 셀당 1.8분 → 12.2초 (판정 규칙 변경만으로 9배)"
+ ],
+ "control_track_yolo": {
+  "_status": "보존 — 지우지 않는다. 같은 시험지의 대조군이고 계약이 YOLO 를 전제하고 있어 되돌아갈 수도 있다",
+  "weight_file": "train_ext_crop_v5_idcap/best.pt",
+  "architecture": "yolo11m (detection)",
+  "classes": {
+   "0": "Damaged",
+   "1": "Pollution"
+  },
+  "imgsz": 1280,
+  "structure": "클래스별 2패스 — 모델 하나, 추론 두 번",
+  "passes": [
+   {
+    "class": "Pollution",
+    "mode": "plain",
+    "imgsz": 1280,
+    "conf": 0.3,
+    "근거": "conf 0.10~0.30 구간이 평탄해 성능 손실 0 으로 출력만 7.32→3.06개"
+   },
+   {
+    "class": "Damaged",
+    "mode": "sahi",
+    "slice": 640,
+    "overlap": 0.2,
+    "conf": 0.02,
+    "근거": "recall 우선. 정밀도는 후단이 담당"
+   }
+  ],
+  "point_recall": 0.089,
+  "point_recall_thr": 0.05,
+  "point_recall_ratio": 2.07,
+  "warnings": [
+   "EXT 전체를 SAHI 로 돌리지 말 것 — plain 이 이미 R=1.0 이고 SAHI 는 오탐만 늘린다. Damaged 에만 켠다",
+   "conf 0.30/0.02 와 image-level F1 0.98 은 v3.4 계열(train_ext_v34) 기준이고, 점 recall 0.089 는 crop_v5_idcap 기준이다. 다른 가중치·다른 시험지라 섞어 읽으면 안 된다",
+   "F1 0.98 은 Pollution 이 캐리한 평균값이다 (클래스별 0.997 / 0.457)",
+   "iou·max_det·half·SAHI postprocess 미기록. conf 0.02 는 sahi 자동전환 구간이라 CT 에서 발견한 함정이 그대로 적용된다"
+  ]
+ }
 }
