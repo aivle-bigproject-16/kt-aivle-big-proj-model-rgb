@@ -408,9 +408,35 @@ def cell_box(im, tol=55, frac=0.12):
 | `{OUT}/sample_seed42_n150.json` · `sample2_seed2026_n150.json` | 표본 매니페스트 |
 | `{OUT}/vlm_dump_v8.json` | VLM 추론 덤프 |
 | `{OUT}/report_input/` | **리포트 LLM 전달용 JSON** |
-| `{OUT}/modelcard/` | `env.json` · `revisions.json` · `latency_*.json` · `operating_point.json` · `golden_fixture.json` |
+| `{OUT}/modelcard/` | `env.json` · `revisions.json` · `latency_*.json` · `operating_point.json` · `golden_fixture*.json` |
 
 `{OUT}` = `/content/drive/MyDrive/ext_evalset` (`kt_out` 이 읽기 전용이면 자동 폴백)
+
+**레포에 커밋된 것** (재현에 필요한 고정값)
+
+| 파일 | 내용 |
+| --- | --- |
+| `golden_fixture_deploy.json` | **배포 회귀** — 원본 20장 · thr 0.10 · 원본 좌표 |
+| `golden_fixture.json` | 검출기 회귀 — 크롭 20장 · thr 0.08 · 크롭 좌표 |
+| `ext_requirements.lock.txt` | 위 픽스처를 만든 환경 (torch 2.11.0+cu128 · transformers 5.14.1 · pillow 11.3.0) |
+
+픽스처 **이미지 20장은 레포에 없습니다** — 데이터셋 라이선스 대상이라 S3 `models/fixtures/rgb/` 에 있습니다.
+
+### 7.4 회귀 검사 — 배포·업그레이드 뒤 반드시
+
+```bash
+python ext_infer.py --selftest                       # 모델 없이 좌표·계약서
+python ext_infer.py --verify-fixture     --fixture golden_fixture_deploy.json --images <원본 20장 폴더>
+# 회귀 있으면 exit 1
+```
+
+**픽스처 2종은 서로 바꿔 쓸 수 없습니다.** 평가 픽스처는 크롭본(2세대 JPEG) 입력에 thr 0.08,
+배포 픽스처는 원본(1세대) 입력에 thr 0.10 입니다. JPEG 압축 세대가 검출 수를 53% 바꾸기
+때문입니다(카드 §6). 잘못 들이대면 도구가 `_meta.thr_gate` · `_meta.revision` 을 현재 `Config`
+와 대조해 🔴 로 막습니다.
+
+판정은 **`gate` · `n_box` 완전 일치만 실패**, 좌표는 경고입니다 —
+`crop_box` 를 400 px 썸네일에서 계산하므로 Pillow 버전에 따라 1~5 px 흔들립니다(카드 §7.3).
 
 ---
 

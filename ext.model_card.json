@@ -300,16 +300,17 @@
    "ExtInspector.infer_frames(images, names=None)": "프레임별만",
    "Config": "모든 상수 (frozen dataclass)",
    "CONTRACT": "리포트 LLM 계약서 (필드별 신뢰 등급)",
-   "DEPLOY_NOTES": "배포 주의사항 원문"
+   "DEPLOY_NOTES": "배포 주의사항 원문",
+   "verify_fixture(fixture, images_dir)": "골든 픽스처 회귀 — 회귀 시 exit 1"
   },
   "cli": [
    "python ext_infer.py --cell 0041 --glob \"frames/0041_*.jpg\" --out result.json",
    "python ext_infer.py --notes",
-   "python ext_infer.py --selftest"
+   "python ext_infer.py --selftest",
+   "python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images <원본 20장 폴더>"
   ],
   "disk_io": "없음 — 추론 경로에 파일 쓰기 0건 (--out 만 명시적)",
   "memory": "배치 스트리밍. 셀 270장을 한 번에 올리면 약 1.6GB 라 cfg.batch(16)장씩만 상주",
-  "vlm_default": "use_vlm=False — 2단은 판정에 안 쓰이고 유형·등급이 검증 실패했다. 켜면 프레임당 +1.2초 × 결함 후보 수",
   "latency": {
    "per_frame_ms": {
     "decode_crop_cpu": 29,
@@ -358,7 +359,7 @@
    },
    {
     "항목": "라이브러리 버전 고정",
-    "상태": "OK"
+    "상태": "OK — ext_requirements.lock.txt"
    },
    {
     "항목": "출력 좌표계 = 원본",
@@ -366,7 +367,7 @@
    },
    {
     "항목": "골든 픽스처 회귀",
-    "상태": "OK"
+    "상태": "OK (비교 로직 검증 완료) · GPU 환경 1회 실행 필요"
    },
    {
     "항목": "입력 재인코딩 금지 합의",
@@ -380,7 +381,9 @@
     "항목": "계약 enum 확장",
     "상태": "팀 협의"
    }
-  ]
+  ],
+  "vlm_stage": "배포 모듈에 2단 코드가 없다. 스위치(use_vlm)도 두지 않았다 — 없는 기능의 켜기 옵션은 조용한 거짓말이 된다. 판정에 안 쓰이고 유형·등급이 검증 실패했기 때문. 2단이 필요하면 battery_ext_evalset.ipynb §E (프레임당 +1.2초 × 결함 후보 수). identity.vlm_model_id/vlm_revision 은 출처 기록용이다.",
+  "_no_dataset_dependency": "2단이 쓰던 정상 캡 갤러리 16장도 배포 모듈은 읽지 않는다. 데이터셋 이미지라 레포에 못 올리지만 배포 의존성이 아니다."
  },
  "output": {
   "detector_tuple": "(x1, y1, x2, y2, score, tag, query)",
@@ -679,7 +682,7 @@
      "채택": true
     }
    ],
-   "stage1_verdict": "셀당 1.53~1.59분 = 목표 4초 대비 약 23배. 전량 추론은 불가.",
+   "stage1_verdict": "프레임 353 ms. 전량 272프레임이면 셀당 110.4초(목표 4초의 27배)였으나, 30프레임 균등 추출 + flag율 판정으로 셀당 12.2초(3배)까지 줄였다. 자세한 것은 deployment.latency.",
    "_saturated": "배치를 16배 키워도 7% 밖에 안 빨라진다 = 런치 오버헤드가 아니라 연산 자체가 포화다. 이미지 1464×895 를 정사각 패딩(1464²)하고 질의 35개를 매 이미지마다 인코딩하기 때문.",
    "stage2_qwen_sec_per_call": [
     1.19,
@@ -810,23 +813,52 @@
   }
  },
  "fixtures": {
-  "count": 20,
-  "requested_count": "20~30",
-  "status": "✅ 2026-08-06 생성 · 회귀 검증 통과",
-  "path": "{OUT}/modelcard/golden_fixture.json",
-  "_commit": "git 커밋 대상",
-  "seed": 7,
-  "composition": "평가셋 300장에서 추출 (결함·무결함 혼합)",
-  "frozen_values": "프레임별 박스 목록 (bbox · score · tag) + 게이트 판정",
-  "tolerance": {
-   "게이트 판정 · 박스 개수": "완전 일치",
-   "score": "±2e-3",
-   "bbox": "±1 px",
-   "VLM 종류 · 크기": "완전 일치",
-   "VLM 본것 문장": "비교 대상에서 제외"
+  "_why_two": "평가 픽스처는 크롭본(2세대 JPEG) 입력, 배포 픽스처는 원본(1세대) 입력이다. JPEG 세대 차이가 검출 수를 53% 바꾸므로 서로 바꿔 쓸 수 없다.",
+  "deploy": {
+   "path": "golden_fixture_deploy.json",
+   "_commit": "git 커밋 대상 (이미지는 S3 models/fixtures/rgb/)",
+   "count": 20,
+   "input": "원본 1920x1080",
+   "thr_gate": 0.1,
+   "revision": "95e26936e865f87db1742128404b3c035d47d89d",
+   "transformers": "5.14.1",
+   "frozen_values": "gate · n_box · crop_offset/size · defects(bbox·score·zone·area_pct) · sha256",
+   "coordinate_reference": "original_image",
+   "run": "python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images <원본 20장 폴더>   # 회귀 시 exit 1",
+   "tolerance": {
+    "gate · n_box": "완전 일치 (실패)",
+    "crop_offset · crop_size": "±4 px (경고)",
+    "bbox": "±8 px (경고)",
+    "score": "±2e-3 (경고)"
+   },
+   "_why_tolerance": "게이트와 박스 수만 실패로 처리한다. 이 둘이 운영 동작이다. 좌표는 Pillow 버전에 따라 1~5px 흔들리는 것을 실측했으므로 경고다. 경고까지 실패로 만들면 픽스처가 매번 깨지고, 깨지는 테스트는 아무도 안 본다.",
+   "status": "✅ 2026-08-06 생성 · 비교 로직 오프라인 7종 시험 통과(오경보 0 · 게이트 뒤집기·박스수±1·해시 불일치 전부 검출) · 🔴 GPU 환경에서 1회 실행 필요",
+   "human_label_agreement": "19/20"
   },
-  "_vlm_note": "do_sample=False 라 greedy 이므로 같은 버전·같은 GPU 에서는 재현되지만 토큰 단위 일치는 부동소수에 취약하다. 문장을 문자열 비교하면 픽스처가 매번 깨져 아무도 안 보게 된다.",
-  "_regeneration_note": "픽스처는 매 실행 재생성된다. 그래서 runtime 의 교차버전 동일성은 집계 지표까지만 검증됐다. 버전 간 박스 단위를 보려면 픽스처 파일을 버전별로 보관할 것."
+  "eval": {
+   "path": "golden_fixture.json",
+   "_commit": "git 커밋 대상",
+   "count": 20,
+   "seed": 7,
+   "input": "평가셋 크롭본 (2세대 JPEG)",
+   "thr_gate": 0.08,
+   "composition": "평가셋 300장에서 추출 (결함·무결함 혼합)",
+   "frozen_values": "임계별 박스 수 · top5 (bbox · score · tag) + 게이트 판정",
+   "coordinate_reference": "crop",
+   "run": "battery_ext_modelcard_check.ipynb §8",
+   "tolerance": {
+    "게이트 판정 · 박스 개수": "완전 일치",
+    "score": "±2e-3",
+    "bbox": "±1 px",
+    "VLM 종류 · 크기": "완전 일치",
+    "VLM 본것 문장": "비교 대상에서 제외"
+   },
+   "_revision_note": "생성 당시 revision 미기록(null). 같은 런의 revisions.json 이 로컬 스냅샷 1개(95e26936…)임을 보이므로 사후 확정해 채웠다. 경위는 _meta.revision_출처 에 있다.",
+   "_scope": "검출기 회귀 전용. thr 0.08 이라 배포 설정(0.10) 검증에 쓸 수 없다.",
+   "human_label_agreement": "17/20"
+  },
+  "_vlm_note": "do_sample=False 라 greedy 이므로 같은 버전·같은 GPU 에서는 재현되지만 토큰 단위 일치는 부동소수에 취약하다. 문장을 문자열 비교하면 픽스처가 매번 깨진다.",
+  "env_lock": "ext_requirements.lock.txt — 이 픽스처를 만든 환경(torch 2.11.0+cu128 · transformers 5.14.1 · pillow 11.3.0)"
  },
  "reproduce": {
   "training": "없음 (사전학습 가중치 그대로)",

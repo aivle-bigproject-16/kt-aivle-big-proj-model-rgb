@@ -1,0 +1,838 @@
+{
+ "_meta": {
+  "path": "배포 경로 (원본 → crop_cell → detect)",
+  "n": 20,
+  "thr_gate": 0.1,
+  "n_gate": 8,
+  "thr_loc": 0.12,
+  "owl_id": "google/owlv2-large-patch14-ensemble",
+  "revision": "95e26936e865f87db1742128404b3c035d47d89d",
+  "transformers": "5.14.1",
+  "images": "fixtures_deploy/ — **원본 1920x1080**. S3 models/fixtures/rgb/ 에 올릴 것",
+  "용도": "배포 회귀 — 원본 입력. `python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images <원본20장>`"
+ },
+ "frames": {
+  "EXT__RGB_cell_cylindrical_0094_181__27a91316.jpg": {
+   "sha256": "81000aaa685d28b9",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    775,
+    6
+   ],
+   "crop_size": [
+    354,
+    1074
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 17,
+   "defects": [
+    {
+     "bbox": [
+      1003,
+      758,
+      1023,
+      791
+     ],
+     "zone": "몸통",
+     "area_pct": 0.18,
+     "score": 0.3423
+    },
+    {
+     "bbox": [
+      879,
+      741,
+      905,
+      822
+     ],
+     "zone": "몸통",
+     "area_pct": 0.57,
+     "score": 0.3228
+    },
+    {
+     "bbox": [
+      1073,
+      721,
+      1093,
+      776
+     ],
+     "zone": "몸통",
+     "area_pct": 0.3,
+     "score": 0.1784
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0099_072__78f8b70e.jpg": {
+   "sha256": "108877760c0f7af9",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    1065,
+    66
+   ],
+   "crop_size": [
+    322,
+    861
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 13,
+   "defects": [
+    {
+     "bbox": [
+      1242,
+      855,
+      1253,
+      865
+     ],
+     "zone": "몸통",
+     "area_pct": 0.05,
+     "score": 0.2555
+    },
+    {
+     "bbox": [
+      1187,
+      190,
+      1278,
+      221
+     ],
+     "zone": "금속캡",
+     "area_pct": 1.26,
+     "score": 0.1977
+    },
+    {
+     "bbox": [
+      1294,
+      190,
+      1309,
+      210
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.13,
+     "score": 0.1675
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0106_141__2f65e0db.jpg": {
+   "sha256": "c6a771fa7200d55e",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    805,
+    108
+   ],
+   "crop_size": [
+    338,
+    877
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 8,
+   "defects": [
+    {
+     "bbox": [
+      903,
+      871,
+      918,
+      890
+     ],
+     "zone": "몸통",
+     "area_pct": 0.12,
+     "score": 0.3814
+    },
+    {
+     "bbox": [
+      901,
+      851,
+      978,
+      895
+     ],
+     "zone": "몸통",
+     "area_pct": 1.42,
+     "score": 0.1499
+    },
+    {
+     "bbox": [
+      832,
+      732,
+      843,
+      746
+     ],
+     "zone": "몸통",
+     "area_pct": 0.06,
+     "score": 0.1461
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0132_294__6c4e1661.jpg": {
+   "sha256": "3013bf9368549aa0",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    752,
+    0
+   ],
+   "crop_size": [
+    439,
+    1080
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 42,
+   "defects": [
+    {
+     "bbox": [
+      1010,
+      52,
+      1035,
+      66
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.08,
+     "score": 0.3128
+    },
+    {
+     "bbox": [
+      944,
+      71,
+      972,
+      103
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.2,
+     "score": 0.2711
+    },
+    {
+     "bbox": [
+      1056,
+      724,
+      1083,
+      768
+     ],
+     "zone": "몸통",
+     "area_pct": 0.27,
+     "score": 0.2377
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0205_053__1e762c51.jpg": {
+   "sha256": "bd906d7231bb8f90",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    803,
+    25
+   ],
+   "crop_size": [
+    380,
+    1019
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 14,
+   "defects": [
+    {
+     "bbox": [
+      847,
+      917,
+      859,
+      931
+     ],
+     "zone": "몸통",
+     "area_pct": 0.05,
+     "score": 0.1896
+    },
+    {
+     "bbox": [
+      883,
+      736,
+      934,
+      784
+     ],
+     "zone": "몸통",
+     "area_pct": 0.74,
+     "score": 0.1679
+    },
+    {
+     "bbox": [
+      1015,
+      372,
+      1117,
+      473
+     ],
+     "zone": "몸통",
+     "area_pct": 3.1,
+     "score": 0.1477
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0481_036__ae5f3be3.jpg": {
+   "sha256": "035b44b657c570e6",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    801,
+    77
+   ],
+   "crop_size": [
+    327,
+    940
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 21,
+   "defects": [
+    {
+     "bbox": [
+      1075,
+      729,
+      1084,
+      744
+     ],
+     "zone": "몸통",
+     "area_pct": 0.05,
+     "score": 0.2901
+    },
+    {
+     "bbox": [
+      828,
+      296,
+      1099,
+      382
+     ],
+     "zone": "몸통",
+     "area_pct": 9.08,
+     "score": 0.196
+    },
+    {
+     "bbox": [
+      825,
+      286,
+      1097,
+      384
+     ],
+     "zone": "몸통",
+     "area_pct": 10.39,
+     "score": 0.1656
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0490_263__d5e0c115.jpg": {
+   "sha256": "c0ae4528f39ff60a",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    759,
+    0
+   ],
+   "crop_size": [
+    401,
+    1080
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 36,
+   "defects": [
+    {
+     "bbox": [
+      835,
+      1,
+      895,
+      37
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.56,
+     "score": 0.3981
+    },
+    {
+     "bbox": [
+      1039,
+      64,
+      1096,
+      117
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.78,
+     "score": 0.3744
+    },
+    {
+     "bbox": [
+      824,
+      1,
+      903,
+      52
+     ],
+     "zone": "금속캡",
+     "area_pct": 1.04,
+     "score": 0.2686
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0503_178__91b7f911.jpg": {
+   "sha256": "1f15336aaf7be6bf",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    759,
+    0
+   ],
+   "crop_size": [
+    391,
+    1080
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 39,
+   "defects": [
+    {
+     "bbox": [
+      875,
+      659,
+      912,
+      730
+     ],
+     "zone": "몸통",
+     "area_pct": 0.7,
+     "score": 0.4176
+    },
+    {
+     "bbox": [
+      901,
+      533,
+      933,
+      580
+     ],
+     "zone": "몸통",
+     "area_pct": 0.4,
+     "score": 0.2644
+    },
+    {
+     "bbox": [
+      875,
+      373,
+      1003,
+      504
+     ],
+     "zone": "몸통",
+     "area_pct": 4.49,
+     "score": 0.2624
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0585_001__7e766475.jpg": {
+   "sha256": "1bdda5bbbd9aea23",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    791,
+    71
+   ],
+   "crop_size": [
+    327,
+    971
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 17,
+   "defects": [
+    {
+     "bbox": [
+      824,
+      154,
+      875,
+      188
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.66,
+     "score": 0.3417
+    },
+    {
+     "bbox": [
+      1090,
+      472,
+      1101,
+      494
+     ],
+     "zone": "몸통",
+     "area_pct": 0.09,
+     "score": 0.1958
+    },
+    {
+     "bbox": [
+      1044,
+      202,
+      1075,
+      220
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.21,
+     "score": 0.1822
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0633_129__54f625e5.jpg": {
+   "sha256": "302cb018656c6a4e",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    818,
+    76
+   ],
+   "crop_size": [
+    254,
+    966
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 28,
+   "defects": [
+    {
+     "bbox": [
+      824,
+      245,
+      941,
+      977
+     ],
+     "zone": "몸통",
+     "area_pct": 34.9,
+     "score": 0.37
+    },
+    {
+     "bbox": [
+      820,
+      419,
+      835,
+      472
+     ],
+     "zone": "몸통",
+     "area_pct": 0.32,
+     "score": 0.3662
+    },
+    {
+     "bbox": [
+      832,
+      574,
+      881,
+      914
+     ],
+     "zone": "몸통",
+     "area_pct": 6.79,
+     "score": 0.2109
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0671_042__fcf5ac51.jpg": {
+   "sha256": "4e2b0875e2465ede",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    801,
+    101
+   ],
+   "crop_size": [
+    322,
+    945
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 23,
+   "defects": [
+    {
+     "bbox": [
+      982,
+      579,
+      1015,
+      747
+     ],
+     "zone": "몸통",
+     "area_pct": 2.19,
+     "score": 0.5335
+    },
+    {
+     "bbox": [
+      1063,
+      814,
+      1082,
+      841
+     ],
+     "zone": "몸통",
+     "area_pct": 0.2,
+     "score": 0.3225
+    },
+    {
+     "bbox": [
+      949,
+      190,
+      969,
+      249
+     ],
+     "zone": "금속캡",
+     "area_pct": 0.47,
+     "score": 0.2471
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0707_095__263fac6a.jpg": {
+   "sha256": "d023d4c1bfd13bfe",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    791,
+    85
+   ],
+   "crop_size": [
+    332,
+    966
+   ],
+   "human_label": "결함",
+   "gate": "결함",
+   "n_box": 15,
+   "defects": [
+    {
+     "bbox": [
+      1001,
+      453,
+      1039,
+      543
+     ],
+     "zone": "몸통",
+     "area_pct": 1.27,
+     "score": 0.4385
+    },
+    {
+     "bbox": [
+      911,
+      602,
+      928,
+      624
+     ],
+     "zone": "몸통",
+     "area_pct": 0.14,
+     "score": 0.2693
+    },
+    {
+     "bbox": [
+      1008,
+      518,
+      1031,
+      546
+     ],
+     "zone": "몸통",
+     "area_pct": 0.24,
+     "score": 0.2583
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0924_094__db97fdf9.jpg": {
+   "sha256": "d9263b8f6e961442",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    833,
+    276
+   ],
+   "crop_size": [
+    248,
+    781
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 1,
+   "defects": []
+  },
+  "EXT__RGB_cell_cylindrical_0927_162__01d0a0c0.jpg": {
+   "sha256": "731b2ed61dc04c0c",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    811,
+    0
+   ],
+   "crop_size": [
+    306,
+    1080
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 5,
+   "defects": []
+  },
+  "EXT__RGB_cell_cylindrical_0928_008__11a9a7b9.jpg": {
+   "sha256": "e65179891ac656a1",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    778,
+    0
+   ],
+   "crop_size": [
+    306,
+    1080
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 6,
+   "defects": []
+  },
+  "EXT__RGB_cell_cylindrical_0955_022__6f8676bc.jpg": {
+   "sha256": "e5b4bd9c31275a1f",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    831,
+    0
+   ],
+   "crop_size": [
+    296,
+    1080
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 6,
+   "defects": []
+  },
+  "EXT__RGB_cell_cylindrical_0955_253__20bad200.jpg": {
+   "sha256": "4d4c0cdf6ba0f49d",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    795,
+    269
+   ],
+   "crop_size": [
+    248,
+    811
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 1,
+   "defects": []
+  },
+  "EXT__RGB_cell_cylindrical_1016_186__5763a3cc.jpg": {
+   "sha256": "8943b9bfa4a0f3c1",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    257,
+    289
+   ],
+   "crop_size": [
+    877,
+    791
+   ],
+   "human_label": "정상",
+   "gate": "결함",
+   "n_box": 18,
+   "defects": [
+    {
+     "bbox": [
+      777,
+      735,
+      791,
+      750
+     ],
+     "zone": "몸통",
+     "area_pct": 0.03,
+     "score": 0.3061
+    },
+    {
+     "bbox": [
+      677,
+      900,
+      694,
+      915
+     ],
+     "zone": "몸통",
+     "area_pct": 0.04,
+     "score": 0.2012
+    },
+    {
+     "bbox": [
+      340,
+      598,
+      361,
+      618
+     ],
+     "zone": "몸통",
+     "area_pct": 0.06,
+     "score": 0.1741
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_1036_008__a5ba9471.jpg": {
+   "sha256": "9d29a3e2080b86a1",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    812,
+    0
+   ],
+   "crop_size": [
+    295,
+    1080
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 5,
+   "defects": []
+  },
+  "EXT__RGB_cell_cylindrical_1095_255__7f782a10.jpg": {
+   "sha256": "622566fa236e6236",
+   "orig_size": [
+    1920,
+    1080
+   ],
+   "crop_offset": [
+    762,
+    27
+   ],
+   "crop_size": [
+    338,
+    982
+   ],
+   "human_label": "정상",
+   "gate": "정상",
+   "n_box": 3,
+   "defects": []
+  }
+ }
+}

@@ -1,0 +1,1479 @@
+{
+ "_meta": {
+  "seed": 7,
+  "n": 20,
+  "thr_gate": 0.08,
+  "n_gate": 8,
+  "thr_loc": 0.12,
+  "owl_id": "google/owlv2-large-patch14-ensemble",
+  "revision": "95e26936e865f87db1742128404b3c035d47d89d",
+  "transformers": "5.14.1",
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "revision_출처": "생성 당시 미기록. 같은 런의 revisions.json 이 로컬 스냅샷 1개(95e26936e865…)임을 보여주므로 사후 확정",
+  "path": "평가 경로 (이미 잘린 크롭 이미지 → detect)",
+  "용도": "검출기 회귀 — 평가셋 크롭 입력. 배포 검증에는 쓰지 말 것(thr 0.08)",
+  "images": "evalset images/ — 크롭본(2세대 JPEG)"
+ },
+ "frames": {
+  "EXT__RGB_cell_cylindrical_0094_181__27a91316.jpg": {
+   "sha256": "b29658e0bd4f8675",
+   "size": [
+    354,
+    1074
+   ],
+   "human_points": 1,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 45,
+    "0.08": 21,
+    "0.12": 4,
+    "0.18": 2
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      226.3,
+      750.9,
+      247.1,
+      786.8
+     ],
+     "score": 0.3219,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      103.7,
+      736.2,
+      130.1,
+      813.1
+     ],
+     "score": 0.275,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      174.6,
+      99.5,
+      209.4,
+      125.3
+     ],
+     "score": 0.1401,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      132.2,
+      85.2,
+      159.3,
+      101.2
+     ],
+     "score": 0.1265,
+     "tag": "오염·이물질",
+     "query": "foreign particle on surface"
+    },
+    {
+     "bbox": [
+      32.4,
+      339.4,
+      42.9,
+      355.9
+     ],
+     "score": 0.1194,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0099_072__78f8b70e.jpg": {
+   "sha256": "62319fcb93f3c7ce",
+   "size": [
+    320,
+    858
+   ],
+   "human_points": 4,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 30,
+    "0.08": 14,
+    "0.12": 4,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      176.9,
+      787.7,
+      187.3,
+      797.6
+     ],
+     "score": 0.1909,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      193.7,
+      136.4,
+      211.5,
+      171.5
+     ],
+     "score": 0.1483,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      227.2,
+      123.3,
+      243.5,
+      144.8
+     ],
+     "score": 0.1429,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      192.5,
+      150.2,
+      211.8,
+      177.9
+     ],
+     "score": 0.1366,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      14.7,
+      512.0,
+      235.4,
+      805.4
+     ],
+     "score": 0.1114,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0106_141__2f65e0db.jpg": {
+   "sha256": "bf43f217f746c648",
+   "size": [
+    334,
+    877
+   ],
+   "human_points": 1,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 21,
+    "0.08": 8,
+    "0.12": 1,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      96.9,
+      762.4,
+      111.3,
+      781.9
+     ],
+     "score": 0.4075,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      25.4,
+      623.9,
+      36.4,
+      637.8
+     ],
+     "score": 0.1059,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      96.3,
+      761.4,
+      111.0,
+      780.1
+     ],
+     "score": 0.0923,
+     "tag": "녹·부식",
+     "query": "reddish brown spot"
+    },
+    {
+     "bbox": [
+      212.5,
+      133.6,
+      250.2,
+      157.4
+     ],
+     "score": 0.0894,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      98.0,
+      770.7,
+      110.8,
+      784.0
+     ],
+     "score": 0.087,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0132_294__6c4e1661.jpg": {
+   "sha256": "c5d1855533f59065",
+   "size": [
+    439,
+    1080
+   ],
+   "human_points": 3,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 45,
+    "0.12": 18,
+    "0.18": 7
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      258.3,
+      52.8,
+      282.8,
+      66.3
+     ],
+     "score": 0.2699,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      192.7,
+      71.7,
+      220.0,
+      102.0
+     ],
+     "score": 0.2492,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      232.2,
+      66.8,
+      258.8,
+      100.5
+     ],
+     "score": 0.2316,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      179.2,
+      81.4,
+      201.0,
+      101.3
+     ],
+     "score": 0.1946,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      325.9,
+      860.2,
+      402.1,
+      976.4
+     ],
+     "score": 0.1927,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0205_053__1e762c51.jpg": {
+   "sha256": "cb572509c877c6c9",
+   "size": [
+    378,
+    1017
+   ],
+   "human_points": 2,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 18,
+    "0.12": 5,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      86.0,
+      712.2,
+      127.9,
+      756.5
+     ],
+     "score": 0.2166,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      66.3,
+      701.8,
+      133.7,
+      762.9
+     ],
+     "score": 0.1676,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      43.1,
+      889.2,
+      56.1,
+      904.3
+     ],
+     "score": 0.1487,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      173.1,
+      157.9,
+      227.4,
+      187.0
+     ],
+     "score": 0.1231,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      170.0,
+      153.0,
+      232.3,
+      183.6
+     ],
+     "score": 0.1229,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0481_036__ae5f3be3.jpg": {
+   "sha256": "4ff23843a59bb74a",
+   "size": [
+    327,
+    940
+   ],
+   "human_points": 2,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 19,
+    "0.12": 7,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      274.4,
+      651.9,
+      282.5,
+      667.0
+     ],
+     "score": 0.2216,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      27.7,
+      201.4,
+      299.0,
+      303.8
+     ],
+     "score": 0.1404,
+     "tag": "벗겨짐·박리",
+     "query": "peeling film edge"
+    },
+    {
+     "bbox": [
+      182.4,
+      390.2,
+      272.8,
+      530.0
+     ],
+     "score": 0.1373,
+     "tag": "오염·이물질",
+     "query": "foreign particle on surface"
+    },
+    {
+     "bbox": [
+      82.2,
+      345.6,
+      228.1,
+      436.8
+     ],
+     "score": 0.1316,
+     "tag": "오염·이물질",
+     "query": "foreign particle on surface"
+    },
+    {
+     "bbox": [
+      141.8,
+      709.0,
+      155.2,
+      723.5
+     ],
+     "score": 0.1308,
+     "tag": "오염·이물질",
+     "query": "foreign particle on surface"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0490_263__d5e0c115.jpg": {
+   "sha256": "814a938cea2e9879",
+   "size": [
+    401,
+    1080
+   ],
+   "human_points": 4,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 37,
+    "0.12": 15,
+    "0.18": 7
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      74.8,
+      1.2,
+      135.4,
+      36.7
+     ],
+     "score": 0.3722,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      281.1,
+      64.9,
+      336.5,
+      115.3
+     ],
+     "score": 0.3472,
+     "tag": "녹·부식",
+     "query": "brown stain on surface"
+    },
+    {
+     "bbox": [
+      63.0,
+      0.4,
+      144.5,
+      54.6
+     ],
+     "score": 0.2992,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      6.3,
+      63.4,
+      24.4,
+      96.6
+     ],
+     "score": 0.2363,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      354.4,
+      1047.6,
+      365.4,
+      1058.4
+     ],
+     "score": 0.2117,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0503_178__91b7f911.jpg": {
+   "sha256": "96854e2b94d08ff2",
+   "size": [
+    389,
+    1080
+   ],
+   "human_points": 5,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 40,
+    "0.12": 20,
+    "0.18": 6
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      115.3,
+      663.9,
+      150.6,
+      732.3
+     ],
+     "score": 0.3552,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      335.9,
+      214.1,
+      375.3,
+      911.2
+     ],
+     "score": 0.2399,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      157.7,
+      397.1,
+      225.7,
+      444.4
+     ],
+     "score": 0.226,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      83.3,
+      243.3,
+      205.8,
+      630.3
+     ],
+     "score": 0.2247,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      142.7,
+      535.8,
+      170.1,
+      577.3
+     ],
+     "score": 0.2105,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0585_001__7e766475.jpg": {
+   "sha256": "046944aebde17b60",
+   "size": [
+    327,
+    971
+   ],
+   "human_points": 1,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 42,
+    "0.08": 18,
+    "0.12": 6,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      33.1,
+      83.6,
+      82.0,
+      116.3
+     ],
+     "score": 0.2802,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      101.1,
+      202.8,
+      120.2,
+      220.9
+     ],
+     "score": 0.1511,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    },
+    {
+     "bbox": [
+      141.2,
+      149.7,
+      195.8,
+      175.7
+     ],
+     "score": 0.1479,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    },
+    {
+     "bbox": [
+      254.1,
+      130.9,
+      282.5,
+      148.6
+     ],
+     "score": 0.1446,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      299.7,
+      401.8,
+      309.6,
+      422.6
+     ],
+     "score": 0.1382,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0633_129__54f625e5.jpg": {
+   "sha256": "c487c5e7586931ee",
+   "size": [
+    254,
+    961
+   ],
+   "human_points": 2,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 28,
+    "0.12": 12,
+    "0.18": 2
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      7.0,
+      166.6,
+      121.6,
+      906.9
+     ],
+     "score": 0.348,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      3.1,
+      341.2,
+      16.9,
+      395.8
+     ],
+     "score": 0.3215,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      6.5,
+      172.6,
+      120.6,
+      901.8
+     ],
+     "score": 0.1738,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      15.1,
+      496.0,
+      62.2,
+      844.8
+     ],
+     "score": 0.1694,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      72.7,
+      84.8,
+      212.2,
+      171.5
+     ],
+     "score": 0.167,
+     "tag": "녹·부식",
+     "query": "rust"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0671_042__fcf5ac51.jpg": {
+   "sha256": "194973ae9a5ee1ac",
+   "size": [
+    319,
+    945
+   ],
+   "human_points": 1,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 50,
+    "0.08": 27,
+    "0.12": 13,
+    "0.18": 5
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      180.0,
+      476.9,
+      214.6,
+      642.3
+     ],
+     "score": 0.4582,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      262.5,
+      712.4,
+      280.1,
+      739.7
+     ],
+     "score": 0.317,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      148.7,
+      89.5,
+      167.9,
+      146.8
+     ],
+     "score": 0.2348,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      88.4,
+      115.5,
+      125.8,
+      136.0
+     ],
+     "score": 0.2105,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      269.6,
+      885.6,
+      291.3,
+      905.1
+     ],
+     "score": 0.2059,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0707_095__263fac6a.jpg": {
+   "sha256": "03d24dc196ccaeac",
+   "size": [
+    330,
+    964
+   ],
+   "human_points": 2,
+   "human_label": "결함",
+   "n_box": {
+    "0.05": 37,
+    "0.08": 17,
+    "0.12": 13,
+    "0.18": 8
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      211.0,
+      366.7,
+      247.7,
+      453.7
+     ],
+     "score": 0.375,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      216.5,
+      404.6,
+      241.2,
+      424.7
+     ],
+     "score": 0.2044,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      41.5,
+      785.4,
+      60.4,
+      809.7
+     ],
+     "score": 0.198,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      120.8,
+      516.6,
+      135.4,
+      536.3
+     ],
+     "score": 0.1946,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      106.0,
+      374.8,
+      250.8,
+      545.8
+     ],
+     "score": 0.1914,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0924_094__db97fdf9.jpg": {
+   "sha256": "f3baab1e788cc748",
+   "size": [
+    246,
+    779
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 7,
+    "0.08": 0,
+    "0.12": 0,
+    "0.18": 0
+   },
+   "gate": "정상",
+   "top5": [
+    {
+     "bbox": [
+      3.8,
+      214.2,
+      242.1,
+      771.3
+     ],
+     "score": 0.0752,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      11.0,
+      33.8,
+      225.3,
+      172.8
+     ],
+     "score": 0.0605,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      38.6,
+      135.1,
+      189.7,
+      208.4
+     ],
+     "score": 0.0554,
+     "tag": "벗겨짐·박리",
+     "query": "peeling film edge"
+    },
+    {
+     "bbox": [
+      51.0,
+      129.7,
+      136.7,
+      167.5
+     ],
+     "score": 0.0541,
+     "tag": "벗겨짐·박리",
+     "query": "peeling film edge"
+    },
+    {
+     "bbox": [
+      46.1,
+      138.5,
+      187.9,
+      205.4
+     ],
+     "score": 0.0519,
+     "tag": "벗겨짐·박리",
+     "query": "peeling film edge"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0927_162__01d0a0c0.jpg": {
+   "sha256": "26fe2ed9468fcf78",
+   "size": [
+    301,
+    1063
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 17,
+    "0.08": 5,
+    "0.12": 0,
+    "0.18": 0
+   },
+   "gate": "정상",
+   "top5": [
+    {
+     "bbox": [
+      52.5,
+      566.2,
+      277.6,
+      943.7
+     ],
+     "score": 0.1157,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      104.1,
+      189.7,
+      164.3,
+      214.0
+     ],
+     "score": 0.1057,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    },
+    {
+     "bbox": [
+      8.2,
+      518.3,
+      298.9,
+      1051.5
+     ],
+     "score": 0.1005,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      60.9,
+      173.6,
+      90.8,
+      196.1
+     ],
+     "score": 0.0877,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      219.2,
+      811.0,
+      229.2,
+      830.2
+     ],
+     "score": 0.0835,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0928_008__11a9a7b9.jpg": {
+   "sha256": "41359378bc74be65",
+   "size": [
+    303,
+    1043
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 20,
+    "0.08": 10,
+    "0.12": 2,
+    "0.18": 0
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      50.8,
+      744.1,
+      59.1,
+      755.0
+     ],
+     "score": 0.1423,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      -4.0,
+      531.0,
+      289.0,
+      1033.8
+     ],
+     "score": 0.1234,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    },
+    {
+     "bbox": [
+      59.1,
+      164.6,
+      84.9,
+      188.9
+     ],
+     "score": 0.1148,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      57.1,
+      157.6,
+      83.5,
+      184.0
+     ],
+     "score": 0.1081,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      76.6,
+      165.1,
+      137.3,
+      193.2
+     ],
+     "score": 0.0961,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0955_022__6f8676bc.jpg": {
+   "sha256": "4dddd8ee4d471968",
+   "size": [
+    296,
+    1080
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 30,
+    "0.08": 10,
+    "0.12": 4,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      137.5,
+      1073.2,
+      150.7,
+      1086.5
+     ],
+     "score": 0.2324,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      139.7,
+      855.8,
+      148.2,
+      864.4
+     ],
+     "score": 0.1578,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      43.3,
+      551.4,
+      273.1,
+      915.0
+     ],
+     "score": 0.1416,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      76.2,
+      171.5,
+      174.1,
+      190.1
+     ],
+     "score": 0.1217,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    },
+    {
+     "bbox": [
+      58.7,
+      155.2,
+      85.9,
+      174.7
+     ],
+     "score": 0.1146,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_0955_253__20bad200.jpg": {
+   "sha256": "0de07fc645086b57",
+   "size": [
+    248,
+    756
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 16,
+    "0.08": 2,
+    "0.12": 0,
+    "0.18": 0
+   },
+   "gate": "정상",
+   "top5": [
+    {
+     "bbox": [
+      157.9,
+      83.2,
+      174.5,
+      106.9
+     ],
+     "score": 0.0841,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      120.0,
+      105.2,
+      163.1,
+      128.6
+     ],
+     "score": 0.0804,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      160.4,
+      99.3,
+      171.0,
+      112.2
+     ],
+     "score": 0.0769,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      3.8,
+      215.3,
+      246.0,
+      746.9
+     ],
+     "score": 0.0742,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      94.3,
+      124.1,
+      130.9,
+      139.4
+     ],
+     "score": 0.0723,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_1016_186__5763a3cc.jpg": {
+   "sha256": "7f717b5ad29508b6",
+   "size": [
+    871,
+    791
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 28,
+    "0.08": 14,
+    "0.12": 3,
+    "0.18": 1
+   },
+   "gate": "결함",
+   "top5": [
+    {
+     "bbox": [
+      517.8,
+      447.1,
+      531.5,
+      461.1
+     ],
+     "score": 0.2349,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      418.5,
+      611.6,
+      433.7,
+      624.9
+     ],
+     "score": 0.1408,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      82.0,
+      309.5,
+      102.2,
+      329.0
+     ],
+     "score": 0.1285,
+     "tag": "긁힘·스크래치",
+     "query": "scratch mark"
+    },
+    {
+     "bbox": [
+      733.1,
+      87.3,
+      753.0,
+      110.2
+     ],
+     "score": 0.1151,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      13.4,
+      186.1,
+      867.3,
+      787.0
+     ],
+     "score": 0.1058,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_1036_008__a5ba9471.jpg": {
+   "sha256": "fa9e141c3fa6a6b0",
+   "size": [
+    294,
+    1080
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 18,
+    "0.08": 6,
+    "0.12": 2,
+    "0.18": 1
+   },
+   "gate": "정상",
+   "top5": [
+    {
+     "bbox": [
+      48.6,
+      729.0,
+      57.5,
+      737.8
+     ],
+     "score": 0.1805,
+     "tag": "오염·이물질",
+     "query": "smudge"
+    },
+    {
+     "bbox": [
+      4.1,
+      531.6,
+      292.4,
+      1070.5
+     ],
+     "score": 0.1241,
+     "tag": "오염·이물질",
+     "query": "white residue"
+    },
+    {
+     "bbox": [
+      55.8,
+      170.1,
+      83.7,
+      193.7
+     ],
+     "score": 0.1139,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      79.4,
+      189.5,
+      158.4,
+      205.9
+     ],
+     "score": 0.1001,
+     "tag": "긁힘·스크래치",
+     "query": "scratch"
+    },
+    {
+     "bbox": [
+      6.8,
+      139.3,
+      246.8,
+      243.2
+     ],
+     "score": 0.0829,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    }
+   ]
+  },
+  "EXT__RGB_cell_cylindrical_1095_255__7f782a10.jpg": {
+   "sha256": "7785feeb851a2eb6",
+   "size": [
+    338,
+    979
+   ],
+   "human_points": 0,
+   "human_label": "정상",
+   "n_box": {
+    "0.05": 11,
+    "0.08": 3,
+    "0.12": 0,
+    "0.18": 0
+   },
+   "gate": "정상",
+   "top5": [
+    {
+     "bbox": [
+      210.0,
+      78.1,
+      233.8,
+      100.0
+     ],
+     "score": 0.113,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      64.9,
+      86.1,
+      93.2,
+      109.4
+     ],
+     "score": 0.1016,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      -1.2,
+      508.8,
+      324.8,
+      965.7
+     ],
+     "score": 0.0905,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    },
+    {
+     "bbox": [
+      62.8,
+      77.7,
+      100.4,
+      112.0
+     ],
+     "score": 0.0761,
+     "tag": "파손·찢김",
+     "query": "puncture hole"
+    },
+    {
+     "bbox": [
+      9.8,
+      84.7,
+      326.1,
+      907.9
+     ],
+     "score": 0.0697,
+     "tag": "들뜸",
+     "query": "lifted film edge"
+    }
+   ]
+  }
+ }
+}

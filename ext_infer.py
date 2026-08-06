@@ -20,6 +20,10 @@
   지연   398 ms/프레임 · **셀당 12.2초**(30프레임) ← 전량 검사 시 1.8분
 
 🔴 배포 전 반드시 읽을 것: 아래 DEPLOY_NOTES
+🔴 배포 전 반드시 돌릴 것
+    python ext_infer.py --selftest                       # 모델 없이 좌표·계약서
+    python ext_infer.py --verify-fixture \\
+        --fixture golden_fixture_deploy.json --images <원본 20장 폴더>
 """
 from __future__ import annotations
 
@@ -111,7 +115,10 @@ class Config:
     big_area_pct: float = 1.0  # 셀면적비 이 이상이면 '큼'
     batch: int = 16            # 실측 최적(단 batch 1 대비 7%만 빠르다 = 연산 포화)
     device: str = 'cuda'
-    use_vlm: bool = False      # 🔴 기본 off — 2단 출력은 판정에 안 쓰이고 검증도 못 통과했다
+    # 🔴 2단 VLM(Qwen)은 **이 모듈에 없다.** 스위치도 두지 않는다 —
+    #    "켤 수 있다"고 적어놓고 코드가 없으면 그게 이 프로젝트가 계속 싸워온 조용한 사고다.
+    #    2단이 필요하면 평가 노트북(battery_ext_evalset.ipynb §E)을 쓴다.
+    #    vlm_id/vlm_rev 는 출처 기록용으로만 남긴다(모델카드 §1).
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -184,14 +191,27 @@ DEPLOY_NOTES = """
    유형 이름·심각도 등급은 **검증을 통과하지 못했다**. 리포트 참고용으로만 내보내며
    계약서에 신뢰='낮음'으로 명시된다. 이 값으로 자동 조치를 하면 안 된다.
 
-3. 2단 VLM(Qwen)은 기본 꺼져 있다 (use_vlm=False)
-   판정에 안 쓰이고, 유형·등급 출력이 전부 검증 실패했다.
-   켜면 프레임당 +1.2초 × 결함 후보 수가 더해진다.
+3. 2단 VLM(Qwen)은 **이 배포 모듈에 들어 있지 않다**
+   판정에 안 쓰이고(게이트는 박스 개수만 센다), 유형·등급 출력이 전부 검증 실패했다.
+   스위치도 두지 않았다 — 없는 기능의 켜기 옵션은 조용한 거짓말이 된다.
+   2단 결과가 필요하면 평가 노트북 battery_ext_evalset.ipynb §E 를 쓴다(프레임당 +1.2초/후보).
+   Config.vlm_id / vlm_rev 는 **출처 기록용**이다. 로드 코드는 이 파일에 없다.
+
+   ⚠️ 관련: 2단이 쓰던 '정상 캡 갤러리 16장'도 이 모듈은 **읽지 않는다.**
+      데이터셋 이미지라 레포에 못 올리는데, 배포 의존성이 아니므로 문제되지 않는다.
 
 4. 좌표계
    입력은 원본 이미지, 출력 bbox도 원본 좌표다. 내부 크롭은 우리가 하고 오프셋을 더해 돌려준다.
 
-5. 고정할 것
+5. 배포·업그레이드 뒤에는 골든 픽스처를 돌린다 (자동 방어선은 이것뿐이다)
+   python ext_infer.py --verify-fixture \
+       --fixture golden_fixture_deploy.json --images <원본 20장 폴더>
+   · 게이트 판정 · 박스 수 → **완전 일치 필수**
+   · 크롭 오프셋 4px · bbox 8px · score 2e-3 → 경고 (Pillow 버전 차이로 흔들린다)
+   픽스처가 thr 0.08(평가 경로)이면 지금 설정(0.10)을 검증할 수 없다 — 도구가 🔴 로 알린다.
+   픽스처 JSON 은 레포에, 이미지 20장은 S3 models/fixtures/rgb/ 에 있다(라이선스).
+
+6. 고정할 것
    transformers >=5.13.1,<6 (5.13.1·5.14.1에서 동일 결과 확인) · torch 2.11.0+cu128
    모델 revision은 Config에 박혀 있다.
 """
@@ -553,6 +573,94 @@ def verify_crop_equivalence(originals: Sequence[str | Path], crop_dir: str | Pat
     return res
 
 
+def verify_fixture(fixture_json: str | Path, images_dir: str | Path,
+                   cfg: Config | None = None) -> dict:
+    """골든 픽스처 회귀 — 배포 경로가 스냅샷과 같은 결과를 내는지.
+
+    배포·라이브러리 업그레이드·전처리 수정 뒤에 **이것만** 돌리면 된다.
+    전처리가 어긋나도 서버는 200 을 반환하므로, 이게 유일한 자동 방어선이다.
+
+    판정 기준
+      · `gate` · `n_box`  — **정확 일치 필수**. 이 둘이 운영 동작이다
+      · 크롭 오프셋·크기   — 4px 허용(경고). Pillow 버전에 따라 1~5px 흔들린다
+      · bbox              — 8px 허용(경고)
+      · score             — 2e-3 허용(경고)
+    """
+    import hashlib
+    cfg = cfg or Config()
+    fx = json.loads(Path(fixture_json).read_text(encoding='utf-8'))
+    d0 = images_dir and Path(images_dir)
+    names = sorted(fx['frames'])
+    meta = fx.get('_meta', {})
+    print(f'픽스처 {len(names)}장 · {meta.get("path", "경로 미기록")}')
+    print(f'  기록: transformers {meta.get("transformers")} · revision {meta.get("revision")} '
+          f'· thr_gate {meta.get("thr_gate")}')
+    print(f'  현재: thr_gate {cfg.thr_gate} · revision {cfg.owl_rev}')
+    if meta.get('thr_gate') is not None and meta['thr_gate'] != cfg.thr_gate:
+        print(f'  🔴 운영점이 다르다 — 픽스처는 thr {meta["thr_gate"]} 로 만들어졌다. '
+              f'이 픽스처로는 지금 설정을 검증할 수 없다')
+    if meta.get('revision') and meta['revision'] != cfg.owl_rev:
+        print(f'  🔴 모델 revision 이 다르다 — 픽스처 {meta["revision"]} vs 현재 {cfg.owl_rev}')
+
+    fail: list[tuple[str, str]] = []
+    warn: list[tuple[str, str]] = []
+    paths = []
+    for n in names:
+        p = d0 / n
+        if not p.exists():
+            fail.append((n, '이미지 없음')); continue
+        got = hashlib.sha256(p.read_bytes()).hexdigest()[:16]
+        if fx['frames'][n].get('sha256') and got != fx['frames'][n]['sha256']:
+            fail.append((n, f'이미지가 바뀌었다 (sha256 {got} ≠ {fx["frames"][n]["sha256"]})'))
+            continue
+        paths.append((n, str(p)))
+    if not paths:
+        print(f'🔴 검증할 이미지가 없다 — 실패 {len(fail)}건')
+        for n, w in fail[:5]:
+            print(f'  🔴 {n[-42:]:42s} {w}')
+        if any('바뀌었다' in w for _, w in fail):
+            print('   (평가 픽스처를 배포 이미지 폴더에 들이댄 것일 수 있다 — '
+                  '평가는 크롭본, 배포는 원본이라 해시가 다르다)')
+        else:
+            print(f'   (--images 가 가리키는 폴더를 확인할 것: {d0})')
+        return {'fail': fail, 'warn': warn, 'n': 0}
+
+    res = ExtInspector(cfg).infer_frames([p for _, p in paths], names=[n for n, _ in paths])
+    for (n, _), r in zip(paths, res):
+        e = fx['frames'][n]
+        if 'gate' in e and r['판정'] != e['gate']:
+            fail.append((n, f'게이트 {e["gate"]} → {r["판정"]}'))
+        if 'n_box' in e and isinstance(e['n_box'], int) and r['판정_근거']['박스수'] != e['n_box']:
+            fail.append((n, f'박스수 {e["n_box"]} → {r["판정_근거"]["박스수"]}'))
+        for key, cur, tol in (('crop_offset', r['셀_크롭']['오프셋'], 4),
+                              ('crop_size', r['셀_크롭']['크기'], 4)):
+            if key in e and max(abs(a - b) for a, b in zip(e[key], cur)) > tol:
+                warn.append((n, f'{key} {e[key]} → {cur} (>{tol}px)'))
+        for k, ex in enumerate(e.get('defects', [])):
+            if k >= len(r['결함']):
+                warn.append((n, f'결함[{k}] 없음')); continue
+            g = r['결함'][k]
+            if max(abs(a - b) for a, b in zip(ex['bbox'], g['위치']['bbox'])) > 8:
+                warn.append((n, f'결함[{k}] bbox {ex["bbox"]} → {g["위치"]["bbox"]}'))
+            if abs(ex.get('score', 0) - g['_score']) > 2e-3:
+                warn.append((n, f'결함[{k}] score {ex.get("score")} → {g["_score"]}'))
+
+    print(f'\n검사 {len(paths)}장 · 🔴 실패 {len(fail)} · ⚠️ 경고 {len(warn)}')
+    for lab, lst in (('🔴', fail), ('⚠️', warn)):
+        for n, w in lst[:12]:
+            print(f'  {lab} {n[-42:]:42s} {w}')
+        if len(lst) > 12:
+            print(f'     ... 외 {len(lst)-12}건')
+    if not fail:
+        print('\n✅ 회귀 없음 — 게이트 판정과 박스 수가 스냅샷과 전부 일치한다')
+        if warn:
+            print('   (경고는 좌표가 몇 px 흔들린 것이다. 운영 동작은 같다)')
+    else:
+        print('\n🔴 회귀 발생 — 배포하지 말 것.')
+        print('   원인 후보: 라이브러리 버전 · 모델 revision · 크롭 파라미터 · 입력 JPEG 재인코딩')
+    return {'fail': fail, 'warn': warn, 'n': len(paths)}
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     import argparse
     p = argparse.ArgumentParser(description='EXT 외관 검사 추론')
@@ -560,10 +668,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     p.add_argument('--notes', action='store_true', help='배포 전 확인사항 출력')
     p.add_argument('--verify-crop', action='store_true',
                    help='배포 경로(원본→크롭)가 평가 경로와 같은지 검증')
+    p.add_argument('--verify-fixture', action='store_true',
+                   help='골든 픽스처 회귀 — 배포 전 필수')
+    p.add_argument('--fixture', help='--verify-fixture: golden_fixture_deploy.json 경로')
+    p.add_argument('--images', dest='fx_images', help='--verify-fixture: 픽스처 이미지 폴더')
     p.add_argument('--originals', nargs='*', help='--verify-crop: 원본 이미지들')
     p.add_argument('--crop-dir', help='--verify-crop: 기존 크롭 폴더(평가셋 images/)')
     p.add_argument('--cell', help='셀 ID')
-    p.add_argument('--images', nargs='*', help='원본 이미지 경로들')
+    p.add_argument('--frames', nargs='*', help='원본 이미지 경로들 (추론용)')
     p.add_argument('--glob', help='이미지 glob 패턴 (예: "frames/0041_*.jpg")')
     p.add_argument('--out', help='결과 JSON 경로 (없으면 표준출력)')
     a = p.parse_args(argv)
@@ -574,17 +686,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     if a.selftest:
         _selftest()
         return 0
+    if a.verify_fixture:
+        if not (a.fixture and a.fx_images):
+            p.error('--verify-fixture 는 --fixture 와 --images 가 필요하다')
+        r = verify_fixture(a.fixture, a.fx_images)
+        return 0 if not r['fail'] else 1
     if a.verify_crop:
         if not (a.originals and a.crop_dir):
             p.error('--verify-crop 은 --originals 와 --crop-dir 이 필요하다')
         r = verify_crop_equivalence(a.originals, a.crop_dir)
         return 0 if not r['불일치_총'] else 1
 
-    paths = list(a.images or [])
+    paths = list(a.frames or [])
     if a.glob:
         paths += sorted(str(x) for x in Path().glob(a.glob))
     if not paths:
-        p.error('--images 또는 --glob 이 필요하다')
+        p.error('--frames 또는 --glob 이 필요하다')
 
     insp = ExtInspector()
     res = insp.infer_cell(a.cell or 'unknown', paths)
