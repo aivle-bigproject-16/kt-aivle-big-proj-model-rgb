@@ -39,7 +39,7 @@
   "measured_gpu": "NVIDIA A100-SXM4-80GB",
   "driver": "580.82.07",
   "lockfile": null,
-  "_lockfile_status": "값은 확보(env.json). 레포에 ext_requirements.lock.txt 로 커밋만 남았다.",
+  "_lockfile_status": "레포에 ext_requirements.lock.txt 로 커밋돼 있다. 원본 값은 env.json.",
   "_version_range_basis": "transformers 5.13.1 과 5.14.1 두 버전에서 운영점이 소수점까지 동일했다 (P 0.873 / R 0.995 / F1 0.930, 오탐 29 · 놓침 1). 둘 다 post_process_grounded_object_detection 을 쓴다. 이 범위 안에는 버전 위험이 없다는 실측이다.",
   "_version_range_caveat": "검증된 것은 집계 지표(300장 운영점)까지다. 골든 픽스처는 매 실행 재생성되므로 박스 단위 교차버전 일치는 미검증. 엄밀히 보려면 픽스처 파일을 버전별로 보관하고 fixtures 회귀만 돌릴 것.",
   "_risk": "후처리 API 이름이 버전 간 다르다 (post_process_grounded_object_detection ↔ post_process_object_detection). 코드는 지연 평가로 둘 다 처리한다. 더 위험한 건 조용한 쪽 — 후처리 구현이 바뀌어 점수 스케일이 달라지면 thr 0.08·0.12 운영점이 에러 없이 무효가 된다.",
@@ -816,7 +816,8 @@
   "_why_two": "평가 픽스처는 크롭본(2세대 JPEG) 입력, 배포 픽스처는 원본(1세대) 입력이다. JPEG 세대 차이가 검출 수를 53% 바꾸므로 서로 바꿔 쓸 수 없다.",
   "deploy": {
    "path": "golden_fixture_deploy.json",
-   "_commit": "git 커밋 대상 (이미지는 S3 models/fixtures/rgb/)",
+   "_commit": "git 커밋 대상 (이미지 20장도 레포 fixtures_deploy/ 에 있다)",
+   "images": "fixtures_deploy/",
    "count": 20,
    "input": "원본 1920x1080",
    "thr_gate": 0.1,

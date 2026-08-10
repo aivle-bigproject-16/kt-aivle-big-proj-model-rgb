@@ -632,7 +632,7 @@ python ext_infer.py --verify-fixture \
 | | 위치 | 이유 |
 | --- | --- | --- |
 | `golden_fixture*.json` | **git 레포** (프로젝트 루트) | 파일명·해시·박스 수치뿐 |
-| 원본 이미지 20장 | **S3 `models/fixtures/rgb/`** | 데이터셋 라이선스 대상이라 커밋 불가 |
+| 원본 이미지 20장 | **git 레포** `fixtures_deploy/` | CT 레포(`fixtures_bundle/images/`)와 같은 방식. 픽스처 JSON 과 같은 커밋에 묶여 버전이 어긋날 수 없습니다 |
 | `ext_requirements.lock.txt` | git 레포 | 이 픽스처를 만든 환경 (§2) |
 
 ---

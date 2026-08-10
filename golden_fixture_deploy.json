@@ -8,8 +8,8 @@
   "owl_id": "google/owlv2-large-patch14-ensemble",
   "revision": "95e26936e865f87db1742128404b3c035d47d89d",
   "transformers": "5.14.1",
-  "images": "fixtures_deploy/ — **원본 1920x1080**. S3 models/fixtures/rgb/ 에 올릴 것",
-  "용도": "배포 회귀 — 원본 입력. `python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images <원본20장>`"
+  "images": "fixtures_deploy/ — **원본 1920x1080**. 같은 레포에 커밋돼 있다",
+  "용도": "배포 회귀 — 원본 입력. `python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images fixtures_deploy`"
  },
  "frames": {
   "EXT__RGB_cell_cylindrical_0094_181__27a91316.jpg": {

@@ -23,7 +23,7 @@
 🔴 배포 전 반드시 돌릴 것
     python ext_infer.py --selftest                       # 모델 없이 좌표·계약서
     python ext_infer.py --verify-fixture \\
-        --fixture golden_fixture_deploy.json --images <원본 20장 폴더>
+        --fixture golden_fixture_deploy.json --images fixtures_deploy
 """
 from __future__ import annotations
 
@@ -205,11 +205,11 @@ DEPLOY_NOTES = """
 
 5. 배포·업그레이드 뒤에는 골든 픽스처를 돌린다 (자동 방어선은 이것뿐이다)
    python ext_infer.py --verify-fixture \
-       --fixture golden_fixture_deploy.json --images <원본 20장 폴더>
+       --fixture golden_fixture_deploy.json --images fixtures_deploy
    · 게이트 판정 · 박스 수 → **완전 일치 필수**
    · 크롭 오프셋 4px · bbox 8px · score 2e-3 → 경고 (Pillow 버전 차이로 흔들린다)
    픽스처가 thr 0.08(평가 경로)이면 지금 설정(0.10)을 검증할 수 없다 — 도구가 🔴 로 알린다.
-   픽스처 JSON 은 레포에, 이미지 20장은 S3 models/fixtures/rgb/ 에 있다(라이선스).
+   픽스처 JSON 과 이미지 20장 모두 레포에 있다 — `--images fixtures_deploy`.
 
 6. 고정할 것
    transformers >=5.13.1,<6 (5.13.1·5.14.1에서 동일 결과 확인) · torch 2.11.0+cu128

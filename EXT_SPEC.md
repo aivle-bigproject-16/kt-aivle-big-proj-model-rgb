@@ -418,9 +418,10 @@ def cell_box(im, tol=55, frac=0.12):
 | --- | --- |
 | `golden_fixture_deploy.json` | **배포 회귀** — 원본 20장 · thr 0.10 · 원본 좌표 |
 | `golden_fixture.json` | 검출기 회귀 — 크롭 20장 · thr 0.08 · 크롭 좌표 |
+| `fixtures_deploy/` | 배포 픽스처 원본 이미지 20장 (1920×1080) |
 | `ext_requirements.lock.txt` | 위 픽스처를 만든 환경 (torch 2.11.0+cu128 · transformers 5.14.1 · pillow 11.3.0) |
 
-픽스처 **이미지 20장은 레포에 없습니다** — 데이터셋 라이선스 대상이라 S3 `models/fixtures/rgb/` 에 있습니다.
+픽스처 **이미지 20장은 `fixtures_deploy/` 에 있습니다** — `--images fixtures_deploy` 로 바로 돌립니다.
 
 ### 7.4 회귀 검사 — 배포·업그레이드 뒤 반드시
 
