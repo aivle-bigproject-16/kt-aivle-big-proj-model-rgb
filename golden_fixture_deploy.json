@@ -9,7 +9,19 @@
   "revision": "95e26936e865f87db1742128404b3c035d47d89d",
   "transformers": "5.14.1",
   "images": "fixtures_deploy/ — **원본 1920x1080**. 같은 레포에 커밋돼 있다",
-  "용도": "배포 회귀 — 원본 입력. `python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images fixtures_deploy`"
+  "용도": "배포 회귀 — 원본 입력. `python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images fixtures_deploy`",
+  "허용오차": {
+   "sha256": "완전 일치 — 실패. 입력이 바뀌면 비교 자체가 무의미하다",
+   "gate": "완전 일치 — 실패. 이것이 운영 동작이다",
+   "n_box": "완전 일치 — 실패. 게이트가 세는 값이다",
+   "crop_offset": "4px — 경고",
+   "crop_size": "4px — 경고",
+   "defects[].bbox": "8px — 경고",
+   "defects[].score": "2e-3 — 경고",
+   "_경고인_이유": "Pillow 버전에 따라 좌표가 1~5px 흔들린다. 경고를 실패로 올리면 픽스처가 매번 깨지고, 매번 깨지는 테스트는 아무도 안 본다. 2026-08-06 실행은 같은 환경에서 경고 0이었다 — 이 여유는 다른 환경용이지 지금 소모 중인 값이 아니다.",
+   "_검사도구": "python ext_infer.py --verify-fixture --fixture golden_fixture_deploy.json --images fixtures_deploy (이 표를 그대로 집행한다. 직접 구현하지 말 것)"
+  },
+  "_결함유형_없는_이유": "배포 모듈은 1단(OWLv2 검출)만 돌린다. 유형·등급을 내던 2단(VLM)은 검증 실패로 폐기했고 판정에도 안 쓰인다(게이트는 박스 개수만 센다). defects[].zone 은 몸통/금속캡 2값이지 결함 유형이 아니다. 6유형 → 계약 enum 은 미결(카드 §13 #1)."
  },
  "frames": {
   "EXT__RGB_cell_cylindrical_0094_181__27a91316.jpg": {
